@@ -2,10 +2,10 @@ import React from 'react';
 import { MapPin, LogIn, ArrowRight, Sparkles, Star, Utensils, CalendarPlus, TrendingUp } from 'lucide-react';
 
 const photos = [
-  'https://images.unsplash.com/photo-1614104030967-5ca61a54247b?w=400&h=500&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1526318896980-cf78c088247c?w=400&h=500&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1512132411229-c30391241dd8?w=400&h=500&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1564327367919-cb377ea6a88f?w=400&h=500&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=500&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=500&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&h=500&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=500&fit=crop&auto=format',
 ];
 
 export default function LandingPage({ onAuth }: { onAuth: () => void }) {

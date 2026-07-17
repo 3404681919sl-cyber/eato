@@ -19,7 +19,7 @@ export default function AuthPage({ onSuccess }: { onSuccess: () => void }) {
       {/* Left visual panel */}
       <div className='hidden lg:flex flex-1 relative overflow-hidden bg-[#0C0805]'>
         <img
-          src='https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=900&h=1200&fit=crop&auto=format'
+          src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&h=1200&fit=crop&auto=format'
           alt=''
           className='w-full h-full object-cover opacity-40'
         />

@@ -46,7 +46,7 @@ export function getPlatformDealUrl(platform: string, placeName: string, category
 export const SEED: Place[] = [
   {
     id: '1', name: '海底捞火锅',
-    image: 'https://images.unsplash.com/photo-1614104030967-5ca61a54247b?w=120&h=120&fit=crop&auto=format',
+    image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=120&h=120&fit=crop&auto=format',
     stars: 5, category: 'hotpot' as Category, mood: 'must' as Mood,
     plannedMenu: '番茄锅底 · 毛肚 · 鸭肠 · 虾滑 · 牛肉卷',
     visits: [
@@ -56,7 +56,7 @@ export const SEED: Place[] = [
   },
   {
     id: '2', name: '乐鲸寿司',
-    image: 'https://images.unsplash.com/photo-1512132411229-c30391241dd8?w=120&h=120&fit=crop&auto=format',
+    image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=120&h=120&fit=crop&auto=format',
     stars: 4, category: 'sushi' as Category, mood: 'excited' as Mood,
     plannedMenu: 'omakase套餐 · 海鲜饭团 · 炙烤三文鱼',
     visits: [
@@ -65,7 +65,7 @@ export const SEED: Place[] = [
   },
   {
     id: '3', name: '陈记拉面馆',
-    image: 'https://images.unsplash.com/photo-1526318896980-cf78c088247c?w=120&h=120&fit=crop&auto=format',
+    image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=120&h=120&fit=crop&auto=format',
     stars: 4, category: 'noodles' as Category, mood: 'must' as Mood,
     plannedMenu: '招牌牛腩拉面 · 叉烧包 · 溏心蛋',
     visits: [
@@ -74,7 +74,7 @@ export const SEED: Place[] = [
   },
   {
     id: '4', name: '慢调咖啡',
-    image: 'https://images.unsplash.com/photo-1564327367919-cb377ea6a88f?w=120&h=120&fit=crop&auto=format',
+    image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=120&h=120&fit=crop&auto=format',
     stars: 3, category: 'cafe' as Category, mood: 'curious' as Mood,
     plannedMenu: '手冲耶加 · 草莓拿铁 · 可颂 · 提拉米苏',
     visits: [
@@ -84,7 +84,7 @@ export const SEED: Place[] = [
   },
   {
     id: '5', name: '老外婆本帮菜',
-    image: 'https://images.unsplash.com/photo-1658853577090-b96a5bdd5c20?w=120&h=120&fit=crop&auto=format',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=120&h=120&fit=crop&auto=format',
     stars: 5, category: 'local' as Category, mood: 'excited' as Mood,
     plannedMenu: '红烧肉 · 腌笃鲜 · 响油鳝糊 · 草头圈子',
     visits: [
