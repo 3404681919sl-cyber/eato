@@ -91,3 +91,4 @@ export default function DealCard({ deal, category, categoryImg, dealUrl }: DealC
     </div>
   );
 }
+

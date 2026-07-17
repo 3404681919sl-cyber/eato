@@ -15,7 +15,7 @@ interface PlaceRowProps {
   onAddVisit: (placeId: string) => void;
 }
 
-const ROW_GRID = { gridTemplateColumns: '180px 100px 80px 70px 1fr 120px 60px' };
+import { TABLE_ROW_GRID as ROW_GRID } from "../../constants";
 
 export default function PlaceRow({ place, visit, vi, isDealOpen, onToggleDeal, onMutPlace, onMutVisit, onAddVisit }: PlaceRowProps) {
   return (
@@ -108,3 +108,4 @@ export default function PlaceRow({ place, visit, vi, isDealOpen, onToggleDeal, o
     </div>
   );
 }
+

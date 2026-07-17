@@ -74,3 +74,4 @@ export default function DealsPanel({ placeName, category, onClose }: { placeName
     </div>
   );
 }
+

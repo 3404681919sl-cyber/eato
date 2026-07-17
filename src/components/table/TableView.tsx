@@ -4,7 +4,7 @@ import PlaceSearchAdd from './PlaceSearchAdd';
 import PlaceRow from './PlaceRow';
 import DealsPanel from '../deals/DealsPanel';
 
-const ROW_GRID = { gridTemplateColumns: '180px 100px 80px 70px 1fr 120px 60px' };
+import { TABLE_ROW_GRID as ROW_GRID } from '../../constants';
 const HEADERS = ['餐厅', '评分', '分类', '心情', '已点菜单', '打卡记录', ''] as const;
 
 export default function TableView({ places, setPlaces }: { places: Place[]; setPlaces: (p: Place[] | ((prev: Place[]) => Place[])) => void }) {
@@ -79,3 +79,5 @@ export default function TableView({ places, setPlaces }: { places: Place[]; setP
     </div>
   );
 }
+
+
