@@ -18,11 +18,7 @@ export default function AuthPage({ onSuccess }: { onSuccess: () => void }) {
     <div className='min-h-screen bg-background flex' style={{ fontFamily: 'DM Sans, sans-serif' }}>
       {/* Left visual panel */}
       <div className='hidden lg:flex flex-1 relative overflow-hidden bg-[#0C0805]'>
-        <img
-          src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&h=1200&fit=crop&auto=format'
-          alt=''
-          className='w-full h-full object-cover opacity-40'
-        />
+        <div className='w-full h-full' style={{ background: 'linear-gradient(135deg, #2C1810, #BF4E2A40)' }} />
         <div className='absolute inset-0 bg-gradient-to-t from-[#0C0805] via-transparent to-[#0C0805]/60' />
         <div className='absolute bottom-10 left-10 max-w-sm'>
           <div className='flex items-center gap-2.5 mb-4'>

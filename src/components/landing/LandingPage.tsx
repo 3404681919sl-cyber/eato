@@ -2,10 +2,10 @@ import React from 'react';
 import { MapPin, LogIn, ArrowRight, Sparkles, Star, Utensils, CalendarPlus, TrendingUp } from 'lucide-react';
 
 const photos = [
-  'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=500&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=500&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&h=500&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=500&fit=crop&auto=format',
+  '',
+  '',
+  '',
+  '',
 ];
 
 export default function LandingPage({ onAuth }: { onAuth: () => void }) {
@@ -31,7 +31,7 @@ export default function LandingPage({ onAuth }: { onAuth: () => void }) {
         <div className='absolute inset-0 flex'>
           {photos.map((src, i) => (
             <div key={i} className='flex-1 relative overflow-hidden'>
-              <img src={src} alt='' className='w-full h-full object-cover opacity-30' style={{ filter: 'saturate(0.6)' }} />
+              <div className='w-full h-full opacity-30' style={{ backgroundColor: ['#BF4E2A', '#2C1810', '#4A1A0E', '#1A0C08'][i] }} />
             </div>
           ))}
           <div className='absolute inset-0 bg-gradient-to-r from-[#0C0805] via-[#0C0805]/60 to-[#0C0805]/40' />

@@ -6,14 +6,14 @@ import { generateDeals, getPlatformDealUrl } from '../../data';
 
 // Category-specific stock images for deal cards
 const CATEGORY_IMAGES: Record<string, string> = {
-  hotpot: 'https://images.unsplash.com/photo-1614104030967-5ca61a54247b?w=200&h=200&fit=crop&auto=format',
-  sushi: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=200&h=200&fit=crop&auto=format',
-  noodles: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&h=200&fit=crop&auto=format',
-  cafe: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=200&h=200&fit=crop&auto=format',
-  western: 'https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=200&h=200&fit=crop&auto=format',
-  bbq: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=200&h=200&fit=crop&auto=format',
-  local: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&h=200&fit=crop&auto=format',
-  other: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=200&fit=crop&auto=format',
+  hotpot: '/brands/category-hotpot.png',
+  sushi: '/brands/category-sushi.png',
+  noodles: '/brands/category-noodles.png',
+  cafe: '/brands/category-cafe.png',
+  western: '/brands/category-western.png',
+  bbq: '/brands/category-bbq.png',
+  local: '/brands/category-local.png',
+  other: '/brands/category-other.png',
 };
 
 export default function DealsPanel({ placeName, category, onClose }: { placeName: string; category: Category; onClose: () => void }) {

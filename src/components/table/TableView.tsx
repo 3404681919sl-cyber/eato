@@ -5,39 +5,7 @@ import { CAT, MOOD } from '../../constants';
 import { StarRow, MoodPicker, CategoryPicker } from '../../utils';
 import DealsPanel from '../deals/DealsPanel';
 
-function EditableField({ value, onChange, placeholder, multiline }: {
-  value: string; onChange: (v: string) => void; placeholder?: string; multiline?: boolean;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [tmp, setTmp] = useState(value);
-  if (!editing) {
-    return (
-      <span onClick={() => { setTmp(value); setEditing(true); }}
-        className={'cursor-pointer hover:opacity-70 transition-opacity ' + (value ? '' : 'text-muted-foreground/40')}>
-        {value || placeholder || '点击编辑'}
-      </span>
-    );
-  }
-  if (multiline) {
-    return (
-      <textarea value={tmp} onChange={(e) => setTmp(e.target.value)}
-        onBlur={() => { onChange(tmp); setEditing(false); }}
-        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onChange(tmp); setEditing(false); } }}
-        className='w-full text-xs bg-transparent border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none'
-        rows={2} autoFocus placeholder={placeholder} />
-    );
-  }
-  return (
-    <input value={tmp} onChange={(e) => setTmp(e.target.value)}
-      onBlur={() => { onChange(tmp); setEditing(false); }}
-      onKeyDown={(e) => { if (e.key === 'Enter') { onChange(tmp); setEditing(false); } }}
-      className='w-full text-xs bg-transparent border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30'
-      autoFocus placeholder={placeholder} />
-  );
-}
-
-const ROW_GRID = { gridTemplateColumns: '1fr 80px 80px 100px 140px 1fr 60px' };
-
+import EditableField from './EditableField';
 export default function TableView({ places, setPlaces }: { places: Place[]; setPlaces: (p: Place[] | ((prev: Place[]) => Place[])) => void }) {
   const [expandedDeals, setExpandedDeals] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
