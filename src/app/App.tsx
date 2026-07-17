@@ -1,24 +1,21 @@
 ﻿import React, { useState } from "react";
 import { MapPin, Utensils, Calendar, BarChart2 } from "lucide-react";
-import type { Tab } from "../types";
-import { USERS } from "../constants";
-import { usePersistState } from "../hooks/usePersistState";
-import { SEED, buildSeedCalendar } from "../data";
-import type { Place } from "../types";
-import { LocaleProvider, useLocale } from "../i18n";
-import LandingPage from "../components/landing/LandingPage";
-import AuthPage from "../components/auth/AuthPage";
-import TableView from "../components/table/TableView";
-import CalendarView from "../components/calendar/CalendarView";
-import AnalyticsView from "../components/analytics/AnalyticsView";
-import LocaleToggle from "../components/i18n/LocaleToggle";
+import type { Tab } from "./types";
+import { USERS } from "./constants";
+import { LocaleProvider, useLocale } from "./i18n";
+import { DataProvider, useData } from "./services";
+import LandingPage from "./components/landing/LandingPage";
+import AuthPage from "./components/auth/AuthPage";
+import TableView from "./components/table/TableView";
+import CalendarView from "./components/calendar/CalendarView";
+import AnalyticsView from "./components/analytics/AnalyticsView";
+import LocaleToggle from "./components/i18n/LocaleToggle";
 
 function AppContent() {
   const { t } = useLocale();
+  const { places, slots, setPlaces, setSlots } = useData();
   const [screen, setScreen] = useState<"landing" | "auth" | "app">("landing");
   const [tab, setTab] = useState<Tab>("table");
-  const [places, setPlaces] = usePersistState<Place[]>("eato_places", SEED);
-  const [slots, setSlots] = usePersistState<Record<string, string[]>>("eato_slots", buildSeedCalendar());
 
   const checked = places.flatMap((p) => p.visits.filter((v) => v.checkedIn)).length;
   const total = places.flatMap((p) => p.visits).length;
@@ -79,7 +76,9 @@ function AppContent() {
 export default function App() {
   return (
     <LocaleProvider>
-      <AppContent />
+      <DataProvider>
+        <AppContent />
+      </DataProvider>
     </LocaleProvider>
   );
 }
