@@ -15,13 +15,14 @@ export function generateDeals(category: Category): DealsResult {
   var xianyuP   = r(0.60, 0.70);
   var prices = [meituanP, douyinP, dianpingP, taobaoP, xianyuP];
   var minP = Math.min(...prices);
-  var deals: Deal[] = [
+  var baseDeals: Deal[] = [
     { platform: 'meituan',  description: '双人套餐 含饮料',      price: meituanP,  originalPrice: base,  tag: meituanP  === minP ? '最低价' : undefined },
     { platform: 'douyin',   description: '到店团购 免预约',      price: douyinP,   originalPrice: base,  tag: douyinP   === minP ? '最低价' : '热销' },
     { platform: 'dianping', description: 'VIP 套餐 赠甜品',      price: dianpingP, originalPrice: base,  tag: dianpingP === minP ? '最低价' : undefined },
     { platform: 'taobao',   description: '限时秒杀 前10份',      price: taobaoP,   originalPrice: base,  tag: taobaoP   === minP ? '最低价' : '秒杀' },
     { platform: 'xianyu',   description: '转让未使用优惠券',      price: xianyuP,   originalPrice: base,  tag: xianyuP   === minP ? '最低价' : '限时' },
-  ].map((d) => ({ ...d, isBest: d.price === minP }));
+  ];
+  var deals = baseDeals.map((d) => ({ ...d, isBest: d.price === minP }));
   var bestPlatform = deals.find((d) => d.isBest)!.platform;
   var finalPrice = Math.round(minP * 0.92);
   var stackSuggestion = bestPlatform === 'douyin'

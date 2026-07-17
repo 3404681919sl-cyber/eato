@@ -56,7 +56,7 @@ export default function TableView({ places, setPlaces }: { places: Place[]; setP
                 visit={visit}
                 vi={vi}
                 isDealOpen={expandedDeals === visit.id}
-                onToggleDeal={() => setExpandedDeals(isDealOpen ? null : visit.id)}
+                onToggleDeal={() => setExpandedDeals(expandedDeals === visit.id ? null : visit.id)}
                 onMutPlace={mutPlace}
                 onMutVisit={mutVisit}
                 onAddVisit={addVisit}
