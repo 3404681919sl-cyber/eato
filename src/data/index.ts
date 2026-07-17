@@ -2,10 +2,10 @@ import type { Place, Category, Deal, DealsResult, Mood } from '../types';
 import { PLATFORMS } from '../constants';
 
 export function generateDeals(category: Category): DealsResult {
-  var BASE_PRICES: Record<Category, number> = {
+  const BASE: Record<Category, number> = {
     hotpot: 158, sushi: 218, noodles: 58, cafe: 72, western: 248, bbq: 128, local: 98, other: 88,
   };
-  var base = BASE_PRICES[category];
+  var base = BASE[category];
   var r = (lo: number, hi: number) => Math.round(base * lo + Math.random() * base * (hi - lo));
   var meituanP  = r(0.72, 0.80);
   var douyinP   = r(0.65, 0.75);
