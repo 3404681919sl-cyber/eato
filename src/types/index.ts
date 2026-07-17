@@ -72,7 +72,7 @@ export type PlatformConfig = {
 };
 
 export type Deal = {
-  platform: string;
+  platform: PlatformId;
   platformName?: string;
   platformColor?: string;
   description: string;

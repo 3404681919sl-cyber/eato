@@ -3,7 +3,8 @@
 // ── App branding ──
 export const APP_NAME = "Eato";
 export const APP_TAGLINE = "你的智能美食旅行规划助手";
-export const APP_VERSION = "1.0.0";`r`nexport const APP_DESC = "和朋友一起打卡收藏的餐厅，安排聚餐时间，分析消费习惯。让每一顿都值得期待。";
+export const APP_VERSION = "1.0.0";
+export const APP_DESC = "和朋友一起打卡收藏的餐厅，安排聚餐时间，分析消费习惯。让每一顿都值得期待。";
 export const APP_FONT = "'DM Sans', sans-serif";
 export const APP_FONT_SERIF = "'Playfair Display', serif";
 export const APP_FONT_MONO = "'DM Mono', monospace";

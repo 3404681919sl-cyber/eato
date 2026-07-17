@@ -97,7 +97,7 @@ export class MockDataService implements DataService {
   }
 
   async searchDeals(placeName: string, category: Category): Promise<DealsResult> {
-    return generateDeals(category, placeName);
+    return generateDeals(category);
   }
 
   getUsers(): { id: string; name: string; color: string }[] {

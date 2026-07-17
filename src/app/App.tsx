@@ -1,15 +1,15 @@
 ﻿import React, { useState } from "react";
 import { MapPin, Utensils, Calendar, BarChart2 } from "lucide-react";
-import type { Tab } from "./types";
-import { USERS } from "./constants";
-import { LocaleProvider, useLocale } from "./i18n";
-import { DataProvider, useData } from "./services";
-import LandingPage from "./components/landing/LandingPage";
-import AuthPage from "./components/auth/AuthPage";
-import TableView from "./components/table/TableView";
-import CalendarView from "./components/calendar/CalendarView";
-import AnalyticsView from "./components/analytics/AnalyticsView";
-import LocaleToggle from "./components/i18n/LocaleToggle";
+import type { Tab } from "../types";
+import { USERS } from "../constants";
+import { LocaleProvider, useLocale } from "../i18n";
+import { DataProvider, useData } from "../services";
+import LandingPage from "../components/landing/LandingPage";
+import AuthPage from "../components/auth/AuthPage";
+import TableView from "../components/table/TableView";
+import CalendarView from "../components/calendar/CalendarView";
+import AnalyticsView from "../components/analytics/AnalyticsView";
+import LocaleToggle from "../components/i18n/LocaleToggle";
 
 function AppContent() {
   const { t } = useLocale();

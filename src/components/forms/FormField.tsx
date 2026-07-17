@@ -9,9 +9,10 @@ interface FormFieldProps {
   type?: "text" | "textarea" | "number";
   required?: boolean;
   disabled?: boolean;
+  maxLength?: number;
 }
 
-export default function FormField({ label, value, onChange, placeholder, error, type = "text", required, disabled }: FormFieldProps) {
+export default function FormField({ label, value, onChange, placeholder, error, type = "text", required, disabled, maxLength }: FormFieldProps) {
   const inputClass =
     "w-full px-4 py-3 text-sm rounded-xl border text-foreground bg-secondary focus:outline-none focus:ring-2 transition-all " +
     (error ? "border-red-300 focus:ring-red-200" : "border-border focus:ring-primary/30");
@@ -24,11 +25,11 @@ export default function FormField({ label, value, onChange, placeholder, error, 
       </label>
       {type === "textarea" ? (
         <textarea value={value} onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder} disabled={disabled}
+          placeholder={placeholder} disabled={disabled} maxLength={maxLength}
           className={inputClass + " min-h-[80px] resize-y"} rows={3} />
       ) : (
         <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder} disabled={disabled}
+          placeholder={placeholder} disabled={disabled} maxLength={maxLength}
           className={inputClass} />
       )}
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
