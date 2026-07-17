@@ -2,6 +2,7 @@
 import { Star } from 'lucide-react';
 import { CAT } from '../../constants';
 import type { Place, Category } from '../../types';
+import PlaceAvatar from '../table/PlaceAvatar';
 
 export default function TopRestaurants({ places }: { places: Place[] }) {
   const top = [...places].sort((a, b) => b.stars - a.stars).slice(0, 5);
@@ -13,12 +14,7 @@ export default function TopRestaurants({ places }: { places: Place[] }) {
       <div className='space-y-3'>
         {top.map((p) => (
           <div key={p.id} className='flex items-center gap-3'>
-            {p.image ? (
-              <img src={p.image} alt='' className='w-10 h-10 rounded-xl object-cover'
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-            ) : (
-              <div className='w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-xs text-muted-foreground'>?</div>
-            )}
+            <PlaceAvatar place={p} sizePx={40} />
             <div className='flex-1 min-w-0'>
               <p className='text-sm font-semibold text-foreground truncate'>{p.name}</p>
               <div className='flex items-center gap-2'>

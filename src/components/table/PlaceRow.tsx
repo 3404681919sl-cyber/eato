@@ -3,6 +3,7 @@ import { Check, Plus, BadgePercent, ChevronUp } from 'lucide-react';
 import type { Place, Visit } from '../../types';
 import EditableField from './EditableField';
 import { StarRow, MoodPicker, CategoryPicker } from '../../utils';
+import PlaceAvatar from './PlaceAvatar';
 
 interface PlaceRowProps {
   place: Place;
@@ -23,12 +24,7 @@ export default function PlaceRow({ place, visit, vi, isDealOpen, onToggleDeal, o
       style={{ ...ROW_GRID, ...(isDealOpen ? { backgroundColor: '#BF4E2A0D' } : {}) }}>
       {/* Restaurant name + image */}
       <div className='flex items-center gap-3'>
-        {place.image ? (
-          <img src={place.image} alt='' className='w-9 h-9 rounded-xl object-cover flex-shrink-0'
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-        ) : (
-          <div className='w-9 h-9 rounded-xl bg-muted flex items-center justify-center text-xs text-muted-foreground flex-shrink-0'>?</div>
-        )}
+        <PlaceAvatar place={place} sizePx={36} />
         <div className='min-w-0'>
           <EditableField value={place.name} onChange={(v) => onMutPlace(place.id, { name: v })} placeholder='餐厅名称' />
         </div>
