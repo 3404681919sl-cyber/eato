@@ -1,15 +1,17 @@
 ﻿import React, { useState } from 'react';
 import type { Place, Visit } from '../../types';
+import { useLocale } from '../../i18n';
+import { TABLE_ROW_GRID as ROW_GRID } from '../../constants';
 import PlaceSearchAdd from './PlaceSearchAdd';
 import PlaceRow from './PlaceRow';
 import DealsPanel from '../deals/DealsPanel';
 
-import { TABLE_ROW_GRID as ROW_GRID } from '../../constants';
-const HEADERS = ['餐厅', '评分', '分类', '心情', '已点菜单', '打卡记录', ''] as const;
-
 export default function TableView({ places, setPlaces }: { places: Place[]; setPlaces: (p: Place[] | ((prev: Place[]) => Place[])) => void }) {
+  const { t } = useLocale();
   const [expandedDeals, setExpandedDeals] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+
+  const HEADERS = [t('table.header.restaurant'), t('table.header.rating'), t('table.header.category'), t('table.header.mood'), t('table.header.menu'), t('table.header.records'), ''] as const;
 
   const mutPlace = (id: string, patch: Partial<Place>) => {
     setPlaces((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
@@ -38,39 +40,23 @@ export default function TableView({ places, setPlaces }: { places: Place[]; setP
   return (
     <div className='space-y-4'>
       <PlaceSearchAdd value={newName} onChange={setNewName} onAdd={addPlace} />
-
       <div className='bg-card border border-border rounded-2xl overflow-hidden'>
-        {/* Header */}
-        <div className='grid gap-3 px-5 py-3 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wider'
-          style={ROW_GRID}>
+        <div className='grid gap-3 px-5 py-3 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wider' style={ROW_GRID}>
           {HEADERS.map((h) => <span key={h}>{h}</span>)}
         </div>
-
-        {/* Rows */}
         {places.map((place) => (
           <div key={place.id}>
             {place.visits.map((visit, vi) => (
               <PlaceRow
-                key={visit.id}
-                place={place}
-                visit={visit}
-                vi={vi}
+                key={visit.id} place={place} visit={visit} vi={vi}
                 isDealOpen={expandedDeals === visit.id}
                 onToggleDeal={() => setExpandedDeals(isDealOpen ? null : visit.id)}
-                onMutPlace={mutPlace}
-                onMutVisit={mutVisit}
-                onAddVisit={addVisit}
+                onMutPlace={mutPlace} onMutVisit={mutVisit} onAddVisit={addVisit}
               />
             ))}
-
-            {/* Expanded deals row */}
             {expandedDeals && places.find(p => p.visits.some(v => v.id === expandedDeals))?.id === place.id && (
               <div className='border-b border-border/40' style={{ backgroundColor: '#BF4E2A0D' }}>
-                <DealsPanel
-                  placeName={place.name}
-                  category={place.category}
-                  onClose={() => setExpandedDeals(null)}
-                />
+                <DealsPanel placeName={place.name} category={place.category} onClose={() => setExpandedDeals(null)} />
               </div>
             )}
           </div>
@@ -79,5 +65,3 @@ export default function TableView({ places, setPlaces }: { places: Place[]; setP
     </div>
   );
 }
-
-
