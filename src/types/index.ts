@@ -120,3 +120,4 @@ export type AsyncState<T> = { loading: boolean; data: Nullable<T>; error: Nullab
 export type SortDir = "asc" | "desc";
 
 export type ColorHex = string;
+
