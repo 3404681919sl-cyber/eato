@@ -1,18 +1,21 @@
-﻿import React, { useMemo } from 'react';
-import { TrendingUp, Wallet, Target, Clock } from 'lucide-react';
-import type { Place } from '../../types';
-import { CAT } from '../../constants';
-import StatCard from './StatCard';
-import CategoryPieChart from './CategoryPieChart';
-import MonthlyBarChart from './MonthlyBarChart';
-import TopRestaurants from './TopRestaurants';
-import BestDiningPairs from './BestDiningPairs';
+﻿import React, { useMemo } from "react";
+import { TrendingUp, Wallet, Target, Clock } from "lucide-react";
+import type { Place } from "../../types";
+import { CAT } from "../../constants";
+import StatCard from "./StatCard";
+import CategoryPieChart from "./CategoryPieChart";
+import MonthlyBarChart from "./MonthlyBarChart";
+import TopRestaurants from "./TopRestaurants";
+import BestDiningPairs from "./BestDiningPairs";
+import MoodDistribution from "./MoodDistribution";
+import SpendingByCategory from "./SpendingByCategory";
+import StarDistribution from "./StarDistribution";
 
 const statCardDefs = [
-  { icon: <TrendingUp className='w-5 h-5' />, label: '总消费', key: 'totalSpent', color: '#BF4E2A', bg: '#BF4E2A10' },
-  { icon: <Wallet className='w-5 h-5' />, label: '平均每次', key: 'avgPer', color: '#D97706', bg: '#D9770610' },
-  { icon: <Target className='w-5 h-5' />, label: '已打卡', key: 'checked', color: '#16A34A', bg: '#16A34A10' },
-  { icon: <Clock className='w-5 h-5' />, label: '待打卡', key: 'pending', color: '#2563EB', bg: '#2563EB10' },
+  { icon: <TrendingUp className="w-5 h-5" />, label: "总消费", key: "totalSpent", color: "#BF4E2A", bg: "#BF4E2A10" },
+  { icon: <Wallet className="w-5 h-5" />, label: "平均每次", key: "avgPer", color: "#D97706", bg: "#D9770610" },
+  { icon: <Target className="w-5 h-5" />, label: "已打卡", key: "checked", color: "#16A34A", bg: "#16A34A10" },
+  { icon: <Clock className="w-5 h-5" />, label: "待打卡", key: "pending", color: "#2563EB", bg: "#2563EB10" },
 ];
 
 export default function AnalyticsView({ places }: { places: Place[] }) {
@@ -31,15 +34,15 @@ export default function AnalyticsView({ places }: { places: Place[] }) {
     });
 
     const monthly = [
-      { name: '一月', spent: 0 }, { name: '二月', spent: 0 }, { name: '三月', spent: 0 },
-      { name: '四月', spent: 1240 }, { name: '五月', spent: 1860 }, { name: '六月', spent: 2130 },
-      { name: '七月', spent: totalSpent },
+      { name: "一月", spent: 0 }, { name: "二月", spent: 0 }, { name: "三月", spent: 0 },
+      { name: "四月", spent: 1240 }, { name: "五月", spent: 1860 }, { name: "六月", spent: 2130 },
+      { name: "七月", spent: totalSpent },
     ];
 
     const pairs = [
-      { pair: ['小美', '阿帅'], count: 7, color: '#BF4E2A' },
-      { pair: ['小美', '阿豪'], count: 5, color: '#16A34A' },
-      { pair: ['阿帅', '阿豪'], count: 3, color: '#2563EB' },
+      { pair: ["小美", "阿帅"], count: 7, color: "#BF4E2A" },
+      { pair: ["小美", "阿豪"], count: 5, color: "#16A34A" },
+      { pair: ["阿帅", "阿豪"], count: 3, color: "#2563EB" },
     ];
 
     return {
@@ -54,29 +57,36 @@ export default function AnalyticsView({ places }: { places: Place[] }) {
   }, [places]);
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       {/* Stat cards */}
-      <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCardDefs.map((s) => (
           <StatCard
             key={s.key}
             icon={s.icon}
             label={s.label}
-            value={s.key === 'totalSpent' ? '¥' + stats.totalSpent.toLocaleString() : s.key === 'avgPer' ? '¥' + stats.avgPer : s.key === 'checked' ? stats.checked + ' 次' : stats.pending + ' 次'}
+            value={s.key === "totalSpent" ? "¥" + stats.totalSpent.toLocaleString() : s.key === "avgPer" ? "¥" + stats.avgPer : s.key === "checked" ? stats.checked + " 次" : stats.pending + " 次"}
             color={s.color}
             bg={s.bg}
           />
         ))}
       </div>
 
-      {/* Charts row */}
-      <div className='grid lg:grid-cols-2 gap-6'>
+      {/* Charts row 1 */}
+      <div className="grid lg:grid-cols-2 gap-6">
         <CategoryPieChart data={stats.byPlace} />
         <MonthlyBarChart data={stats.monthly} />
       </div>
 
+      {/* Charts row 2 - new */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        <MoodDistribution places={places} />
+        <SpendingByCategory places={places} />
+        <StarDistribution places={places} />
+      </div>
+
       {/* Top restaurants + pairs */}
-      <div className='grid lg:grid-cols-2 gap-6'>
+      <div className="grid lg:grid-cols-2 gap-6">
         <TopRestaurants places={places} />
         <BestDiningPairs pairs={stats.pairs} />
       </div>
