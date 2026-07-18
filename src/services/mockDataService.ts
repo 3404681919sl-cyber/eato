@@ -2,7 +2,7 @@
 import type { DataService } from "./types";
 import { USERS } from "../constants";
 import { SEED, buildSeedCalendar } from "../data";
-import { generateDeals, getPlatformDealUrl } from "../data";
+import { generateDeals } from "../data";
 
 const STORAGE_KEYS = {
   PLACES: "eato_places",

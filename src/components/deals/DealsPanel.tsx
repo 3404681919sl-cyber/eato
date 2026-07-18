@@ -1,77 +1,130 @@
-﻿import React, { useState } from 'react';
-import { ChevronUp } from 'lucide-react';
-import type { Category, DealsResult, DealStatus } from '../../types';
-import { generateDeals, getPlatformDealUrl } from '../../data';
-import DealsIdle from './DealsIdle';
-import DealsLoading from './DealsLoading';
-import DealCard from './DealCard';
-import DealsBestStack from './DealsBestStack';
+import React, { useState } from 'react';
+import { Zap, Loader2, ExternalLink, ChevronUp } from 'lucide-react';
+import type { Category, DealStatus, DealsResult } from '../../types';
+import { PLATFORMS } from '../../constants';
+import { generateDeals } from '../../data/deals';
 
-const CATEGORY_IMAGES: Record<string, string> = {
-  hotpot: '/brands/category-hotpot.svg',
-  sushi: '/brands/category-sushi.svg',
-  noodles: '/brands/category-noodles.svg',
-  cafe: '/brands/category-cafe.svg',
-  western: '/brands/category-western.svg',
-  bbq: '/brands/category-bbq.svg',
-  local: '/brands/category-local.svg',
-  other: '/brands/category-other.svg',
-};
-
-export default function DealsPanel({ placeName, category, onClose }: { placeName: string; category: Category; onClose: () => void }) {
-  const [status, setStatus] = useState<DealStatus>('idle');
+export default function DealsPanel({ category, onClose }: { category: Category; onClose: () => void }) {
+  const [status, setStatus] = useState<DealStatus>("idle");
   const [result, setResult] = useState<DealsResult | null>(null);
 
-  const search = async () => {
-    setStatus('loading');
-    try {
-      const resp = await fetch('/api/deals?place=' + encodeURIComponent(placeName) + '&category=' + category);
-      if (resp.ok) {
-        const data = await resp.json();
-        setResult(data);
-        setStatus('done');
-        return;
-      }
-    } catch {}
-    setResult(generateDeals(category));
-    setStatus('done');
+  const search = () => {
+    setStatus("loading");
+    setTimeout(() => {
+      setResult(generateDeals(category));
+      setStatus("done");
+    }, 1600);
   };
 
-  if (status === 'idle') return <DealsIdle onSearch={search} />;
-  if (status === 'loading') return <DealsLoading />;
+  if (status === "idle") {
+    return (
+      <div className="flex items-center justify-between py-3 px-4">
+        <p className="text-xs text-muted-foreground">点击自动检索各平台最新优惠，AI 为你比对最优组合</p>
+        <button onClick={search}
+          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-90"
+          style={{ backgroundColor: "#BF4E2A", color: "white" }}>
+          <Zap className="w-3 h-3" />
+          开始查询
+        </button>
+      </div>
+    );
+  }
+
+  if (status === "loading") {
+    return (
+      <div className="py-6 flex flex-col items-center gap-3">
+        <div className="flex items-center gap-3">
+          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+          <span className="text-xs text-muted-foreground">正在检索美团、抖音、大众点评、淘宝闪购、闲鱼…</span>
+        </div>
+        <div className="flex gap-2">
+          {Object.values(PLATFORMS).map((p, i) => (
+            <div key={p.name} className="text-xs px-2 py-1 rounded-full font-medium animate-pulse"
+              style={{ backgroundColor: p.bg, color: p.textColor, animationDelay: `${i * 0.15}s` }}>
+              {p.name}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (!result) return null;
 
-  const categoryImg = CATEGORY_IMAGES[category] || CATEGORY_IMAGES.other;
-
   return (
-    <div className='py-4 px-5'>
-      <div className='flex items-center justify-between mb-4'>
-        <h4 className='text-sm font-bold text-foreground'>共找到 {result.deals.length} 个平台优惠</h4>
-        <span className='text-xs text-muted-foreground' style={{ fontFamily: 'DM Mono, monospace' }}>
-          最高可省 ¥{result.saving}
-        </span>
+    <div className="py-4 px-4">
+      <div className="grid grid-cols-1 gap-2 mb-4">
+        {result.deals.map((deal) => {
+          const p = PLATFORMS[deal.platform];
+          const disc = Math.round(((deal.originalPrice - deal.price) / deal.originalPrice) * 100);
+          const urls: Record<string, string> = {
+            meituan: "https://meituan.com", douyin: "https://douyin.com",
+            dianping: "https://dianping.com", taobao: "https://taobao.com", xianyu: "https://xianyu.com",
+          };
+          return (
+            <div key={deal.platform}
+              className={`flex items-center gap-3 rounded-xl px-4 py-2.5 border transition-all ${deal.isBest ? "ring-1" : ""}`}
+              style={{
+                backgroundColor: deal.isBest ? p.bg : "rgba(242,233,213,0.25)",
+                borderColor: deal.isBest ? p.color + "60" : "rgba(150,100,50,0.12)",
+                boxShadow: deal.isBest ? `0 0 0 1px ${p.color}40` : undefined,
+              }}>
+              <div className="flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold min-w-[68px] text-center"
+                style={{ backgroundColor: p.color + "22", color: p.textColor, border: `1px solid ${p.color}40` }}>
+                {p.name}
+              </div>
+              <p className="text-xs text-muted-foreground flex-1 truncate">{deal.description}</p>
+              {deal.tag && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: deal.isBest ? "#BF4E2A" : "#E8963C", color: "white" }}>
+                  {deal.tag}
+                </span>
+              )}
+              <div className="flex items-baseline gap-1 flex-shrink-0">
+                <span className="text-base font-bold" style={{ color: deal.isBest ? "#BF4E2A" : "#2C1810", fontFamily: "DM Mono, monospace" }}>
+                  ¥{deal.price}
+                </span>
+                <span className="text-[11px] text-muted-foreground line-through" style={{ fontFamily: "DM Mono, monospace" }}>
+                  ¥{deal.originalPrice}
+                </span>
+                <span className="text-[10px] font-medium" style={{ color: "#16A34A" }}>
+                  -{disc}%
+                </span>
+              </div>
+              <a href={urls[deal.platform]} target="_blank" rel="noopener noreferrer"
+                className="flex-shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                onClick={(e) => e.stopPropagation()}>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          );
+        })}
       </div>
 
-      <div className='grid grid-cols-1 gap-3 mb-4'>
-        {result.deals.map((deal) => (
-          <DealCard
-            key={deal.platform}
-            deal={deal}
-            category={category}
-            categoryImg={categoryImg}
-            dealUrl={getPlatformDealUrl(deal.platform, placeName, category)}
-          />
-        ))}
+      <div className="rounded-xl px-4 py-3 flex items-start gap-3"
+        style={{ backgroundColor: "#BF4E2A0D", border: "1px solid #BF4E2A25" }}>
+        <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+          style={{ backgroundColor: "#BF4E2A20" }}>
+          <Zap className="w-3 h-3 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold text-primary mb-0.5">AI 智能叠券建议</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{result.bestStack}</p>
+        </div>
+        <div className="flex-shrink-0 text-right">
+          <p className="text-xs text-muted-foreground">可节省</p>
+          <p className="text-lg font-bold leading-tight" style={{ color: "#BF4E2A", fontFamily: "DM Mono, monospace" }}>
+            ¥{result.saving}
+          </p>
+        </div>
       </div>
 
-      <DealsBestStack deals={result.deals} bestStack={result.bestStack} saving={result.saving} finalPrice={result.finalPrice} />
-
-      <button onClick={onClose}
-        className='w-full mt-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all flex items-center justify-center gap-1.5'>
-        <ChevronUp className='w-4 h-4' />
-        收起比价
-      </button>
+      <div className="flex justify-end mt-2">
+        <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+          <ChevronUp className="w-3 h-3" />
+          收起
+        </button>
+      </div>
     </div>
   );
 }
-

@@ -41,12 +41,12 @@ export type CategoryConfig = { label: string; emoji: string; color: string; ligh
 export const CAT: Record<Category, CategoryConfig> = {
   hotpot:  { label: "火锅",  emoji: "🍲", color: "#DC2626", light: "#FEE2E2" },
   cafe:    { label: "茶咖",  emoji: "☕", color: "#2563EB", light: "#DBEAFE" },
-  noodles: { label: "汤面",  emoji: "🍻", color: "#16A34A", light: "#DCFCE7" },
-  sushi:   { label: "寿司",  emoji: "🍆", color: "#92400E", light: "#FEF3C7" },
-  western: { label: "西餐",  emoji: "🍈", color: "#CA8A04", light: "#FEF9C3" },
-  bbq:     { label: "烧烤",  emoji: "🍯", color: "#EA580C", light: "#FFEDD5" },
-  local:   { label: "本帮菜", emoji: "🍱", color: "#7C3AED", light: "#EDE9FE" },
-  other:   { label: "其他",  emoji: "🍍", color: "#6B7280", light: "#F3F4F6" },
+  noodles: { label: "汤面",  emoji: "🍜", color: "#16A34A", light: "#DCFCE7" },
+  sushi:   { label: "寿司",  emoji: "🍣", color: "#92400E", light: "#FEF3C7" },
+  western: { label: "西餐",  emoji: "🍽️", color: "#CA8A04", light: "#FEF9C3" },
+  bbq:     { label: "烧烤",  emoji: "🔥", color: "#EA580C", light: "#FFEDD5" },
+  local:   { label: "本帮菜", emoji: "🥢", color: "#7C3AED", light: "#EDE9FE" },
+  other:   { label: "其他",  emoji: "🍴", color: "#6B7280", light: "#F3F4F6" },
 };
 
 export const CATEGORY_IMAGES: Record<string, string> = {
@@ -65,9 +65,9 @@ export type MoodConfig = { label: string; emoji: string; color: string };
 
 export const MOOD: Record<Mood, MoodConfig> = {
   must:    { label: "超想去", emoji: "🔥", color: "#DC2626" },
-  excited: { label: "很期待", emoji: "🌟", color: "#D97706" },
-  curious: { label: "想试试", emoji: "🎠", color: "#2563EB" },
-  casual:  { label: "随便吃", emoji: "🍔", color: "#6B7280" },
+  excited: { label: "很期待", emoji: "⭐", color: "#D97706" },
+  curious: { label: "想试试", emoji: "👀", color: "#2563EB" },
+  casual:  { label: "随便吃", emoji: "😌", color: "#6B7280" },
 };
 
 // ── Platform config ──

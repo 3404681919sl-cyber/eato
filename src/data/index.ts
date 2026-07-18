@@ -4,4 +4,4 @@
 // from src/services/ instead of importing these directly.
 
 export { SEED, buildSeedCalendar } from "./seed";
-export { generateDeals, getPlatformDealUrl } from "./deals";
+export { generateDeals } from "./deals";
