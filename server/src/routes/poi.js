@@ -22,8 +22,7 @@ router.get("/search", async (req, res) => {
     url.searchParams.set("keywords", keyword);
     url.searchParams.set("types", "餐饮服务"); // 限定餐饮，返回门头照/logo
     url.searchParams.set("offset", "6");
-    url.searchParams.set("citylimit", "true");
-    url.searchParams.set("extensions", "base");
+    url.searchParams.set("extensions", "all");
 
     const resp = await fetch(url.toString());
     const data = await resp.json();
