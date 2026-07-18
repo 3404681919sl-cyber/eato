@@ -701,9 +701,51 @@ function DealsPanel({ category, placeName, onClose }: { category: Category; plac
 
 function TableView({ places, setPlaces }: { places: Place[]; setPlaces: React.Dispatch<React.SetStateAction<Place[]>> }) {
   const [newName, setNewName] = useState("");
+  const [suggestions, setSuggestions] = useState<Array<{ name: string; address: string; photo?: string }>>([]);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
   const [editingMenu, setEditingMenu] = useState<string | null>(null);
   const [editingReview, setEditingReview] = useState<string | null>(null);
   const [expandedDeals, setExpandedDeals] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Debounce POI search
+  useEffect(() => {
+    if (!newName.trim()) {
+      setSuggestions([]);
+      setSuggestOpen(false);
+      return;
+    }
+    const key = import.meta.env.VITE_AMAP_KEY as string | undefined;
+    if (!key) {
+      setSuggestions([]);
+      setSuggestOpen(false);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setSuggestLoading(true);
+      const url = `https://restapi.amap.com/v3/place/text?key=${encodeURIComponent(key)}&keywords=${encodeURIComponent(newName.trim())}&types=050000&extensions=all&offset=10`;
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === "1" && Array.isArray(data.pois)) {
+            setSuggestions(
+              data.pois.map((p: any) => ({
+                name: p.name as string,
+                address: (p.address || "") as string,
+                photo: p.photos?.[0]?.url ? `${p.photos[0].url}?w=120&h=120` : undefined,
+              }))
+            );
+            setSuggestOpen(true);
+          } else {
+            setSuggestions([]);
+          }
+        })
+        .catch(() => setSuggestions([]))
+        .finally(() => setSuggestLoading(false));
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [newName]);
 
   const rows = useMemo(() => {
     const out: Array<{ place: Place; visit: Visit; visitIndex: number; isLast: boolean }> = [];
@@ -740,6 +782,21 @@ function TableView({ places, setPlaces }: { places: Place[]; setPlaces: React.Di
       visits: [{ id: `${id}-1`, date: "", time: "", checkedIn: false, spending: "", review: "" }],
     }]);
     setNewName("");
+    setSuggestions([]);
+    setSuggestOpen(false);
+  };
+
+  const addSuggestedPlace = (item: { name: string; address: string; photo?: string }) => {
+    const id = Date.now().toString();
+    setPlaces((prev) => [...prev, {
+      id, name: item.name, image: item.photo || "", stars: 3, category: "other", mood: "curious",
+      plannedMenu: "",
+      visits: [{ id: `${id}-1`, date: "", time: "", checkedIn: false, spending: "", review: "" }],
+    }]);
+    setNewName("");
+    setSuggestions([]);
+    setSuggestOpen(false);
+    inputRef.current?.blur();
   };
 
   const nowTime = () => {
@@ -760,13 +817,44 @@ function TableView({ places, setPlaces }: { places: Place[]; setPlaces: React.Di
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none z-10" />
             <input
+              ref={inputRef}
               type="text" placeholder="输入店名新增打卡点…" value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addPlace()}
-              className="pl-9 pr-4 py-2 text-sm border border-border rounded-xl bg-card focus:outline-none focus:ring-2 focus:ring-primary/30 w-56 placeholder:text-muted-foreground/60"
+              onKeyDown={(e) => e.key === "Enter" && (suggestOpen && suggestions[0] ? addSuggestedPlace(suggestions[0]) : addPlace())}
+              onFocus={() => newName.trim() && suggestions.length > 0 && setSuggestOpen(true)}
+              className="pl-9 pr-4 py-2 text-sm border border-border rounded-xl bg-card focus:outline-none focus:ring-2 focus:ring-primary/30 w-56 placeholder:text-muted-foreground/60 relative"
             />
+            {/* Suggestions dropdown */}
+            {suggestOpen && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto py-1">
+                {suggestLoading && suggestions.length === 0 && (
+                  <div className="px-3 py-2 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="w-3 h-3 animate-spin" /> 搜索中…
+                  </div>
+                )}
+                {suggestions.map((s, i) => (
+                  <button key={i} type="button" onClick={() => addSuggestedPlace(s)}
+                    className="w-full text-left px-3 py-2 hover:bg-secondary flex items-center gap-3 transition-colors">
+                    {s.photo ? (
+                      <img src={s.photo} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0 bg-muted" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                        <Utensils className="w-3.5 h-3.5 text-muted-foreground/50" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{s.address || "地址未知"}</p>
+                    </div>
+                  </button>
+                ))}
+                {suggestions.length === 0 && !suggestLoading && (
+                  <div className="px-3 py-2 text-xs text-muted-foreground">暂无推荐，按回车直接添加</div>
+                )}
+              </div>
+            )}
           </div>
           <button onClick={addPlace} className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:opacity-90 transition-opacity flex items-center gap-1.5">
             <Plus className="w-3.5 h-3.5" /> 添加
@@ -1238,6 +1326,9 @@ function CalendarView({ slots, setSlots }: { slots: Record<string, string[]>; se
 // ─── Analytics View ───────────────────────────────────────────────────────────
 
 function AnalyticsView({ places }: { places: Place[] }) {
+  const [year, setYear] = useState(new Date().getFullYear());
+  const currentYear = new Date().getFullYear();
+
   const d = useMemo(() => {
     const checked = places.flatMap((p) => p.visits.filter((v) => v.checkedIn).map((v) => ({ place: p, visit: v })));
     const pending = places.flatMap((p) => p.visits.filter((v) => !v.checkedIn));
@@ -1250,15 +1341,37 @@ function AnalyticsView({ places }: { places: Place[] }) {
         visits: p.visits.filter((v) => v.checkedIn).length,
       }))
       .filter((x) => x.value > 0).sort((a, b) => b.value - a.value);
-    const monthly = [
-      { month: "1月", visits: 2, spending: 280 },
-      { month: "2月", visits: 3, spending: 460 },
-      { month: "3月", visits: 1, spending: 148 },
-      { month: "4月", visits: 4, spending: 620 },
-      { month: "5月", visits: checked.length, spending: totalSpend },
-    ];
+
+    // 伪随机但稳定的生成器（按年份 + 月份 + 总数作为 seed）
+    const seeded = (y: number, m: number, total: number) => {
+      const seed = y * 10000 + m * 100 + total * 13;
+      const x = Math.sin(seed) * 10000;
+      const r = x - Math.floor(x);
+      return Math.max(0, Math.round(r * Math.max(1, total / 3)));
+    };
+
+    const monthly = Array.from({ length: 12 }, (_, i) => {
+      const m = i + 1;
+      if (year === currentYear) {
+        // 当前年份：1-5月保留历史数据，6-12月基于当前 visits 分配
+        const historical = [
+          { month: "1月", visits: 2, spending: 280 },
+          { month: "2月", visits: 3, spending: 460 },
+          { month: "3月", visits: 1, spending: 148 },
+          { month: "4月", visits: 4, spending: 620 },
+          { month: "5月", visits: checked.length, spending: totalSpend },
+        ];
+        if (m <= 5) return historical[m - 1];
+        const monthVisits = checked.filter((_, idx) => idx % 7 === (m - 6)).length;
+        return { month: `${m}月`, visits: monthVisits, spending: monthVisits * 80 };
+      }
+      // 其他年份：用 seed 生成模拟数据
+      const v = seeded(year, m, checked.length);
+      return { month: `${m}月`, visits: v, spending: v * (60 + Math.round((Math.sin(year * m) * 10000 - Math.floor(Math.sin(year * m) * 10000)) * 120)) };
+    });
+
     return { checked, pending, totalSpend, rate, byPlace, monthly };
-  }, [places]);
+  }, [places, year, currentYear]);
 
   const kpis = [
     { icon: <MapPin className="w-6 h-6" />,    value: d.pending.length,   unit: "个", label: "待打卡",  color: "#E8963C", bg: "#E8963C" },
@@ -1322,7 +1435,20 @@ function AnalyticsView({ places }: { places: Place[] }) {
 
         {/* Bar chart */}
         <div className="bg-card border border-border rounded-2xl p-6">
-          <h3 className="font-semibold text-foreground text-sm mb-0.5">月度打卡趋势</h3>
+          <div className="flex items-center justify-between mb-0.5">
+            <h3 className="font-semibold text-foreground text-sm">月度打卡趋势</h3>
+            <div className="flex items-center rounded-lg border border-border overflow-hidden text-xs" style={{ fontFamily: "DM Mono, monospace" }}>
+              <button type="button" onClick={() => setYear((y) => y - 1)}
+                className="px-2 py-1 text-muted-foreground hover:bg-secondary transition-colors">
+                <ChevronLeft className="w-3 h-3" />
+              </button>
+              <span className="px-2 py-1 text-foreground font-medium border-x border-border min-w-[3.5rem] text-center">{year}</span>
+              <button type="button" onClick={() => setYear((y) => y + 1)}
+                className="px-2 py-1 text-muted-foreground hover:bg-secondary transition-colors">
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
           <p className="text-xs text-muted-foreground mb-5">你们这几个月的节奏</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={d.monthly} barSize={18}>
