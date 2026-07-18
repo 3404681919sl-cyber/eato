@@ -27,10 +27,11 @@ export default function TableView({ places, setPlaces }: { places: Place[]; setP
     const newVisit: Visit = { id: placeId + '-' + Date.now(), date: '', time: '', checkedIn: false, spending: '', review: '' };
     setPlaces((prev) => prev.map((x) => x.id === placeId ? { ...x, visits: [...x.visits, newVisit] } : x));
   };
-  const addPlace = () => {
-    if (!newName.trim()) return;
+  const addPlace = (payload?: { name: string; image?: string }) => {
+    const name = (payload?.name ?? newName).trim();
+    if (!name) return;
     const newPlace: Place = {
-      id: 'p' + Date.now(), name: newName, image: '', stars: 0,
+      id: 'p' + Date.now(), name, image: payload?.image ?? '', stars: 0,
       category: 'other', mood: 'casual', plannedMenu: '', visits: [],
     };
     setPlaces((prev) => [...prev, newPlace]);
