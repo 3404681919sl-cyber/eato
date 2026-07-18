@@ -4,14 +4,14 @@ import type { Deal } from '../../types';
 import { PLATFORMS } from '../../constants';
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  hotpot: '/brands/category-hotpot.png',
-  sushi: '/brands/category-sushi.png',
-  noodles: '/brands/category-noodles.png',
-  cafe: '/brands/category-cafe.png',
-  western: '/brands/category-western.png',
-  bbq: '/brands/category-bbq.png',
-  local: '/brands/category-local.png',
-  other: '/brands/category-other.png',
+  hotpot: '/brands/category-hotpot.svg',
+  sushi: '/brands/category-sushi.svg',
+  noodles: '/brands/category-noodles.svg',
+  cafe: '/brands/category-cafe.svg',
+  western: '/brands/category-western.svg',
+  bbq: '/brands/category-bbq.svg',
+  local: '/brands/category-local.svg',
+  other: '/brands/category-other.svg',
 };
 
 interface DealCardProps {
