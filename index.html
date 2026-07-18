@@ -15,6 +15,21 @@
     <body>
       
       <div id="root"></div>
+      <div id="boot-error" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; padding:40px; background:#fff; color:#b91c1c; font:14px/1.6 monospace; white-space:pre-wrap; z-index:9999;"></div>
+      <script>
+        window.addEventListener('error', function(e) {
+          var box = document.getElementById('boot-error');
+          if (!box) return;
+          box.style.display = 'block';
+          box.textContent += 'ERROR: ' + e.message + '\n  at ' + (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '') + '\n\n';
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+          var box = document.getElementById('boot-error');
+          if (!box) return;
+          box.style.display = 'block';
+          box.textContent += 'PROMISE REJECTION: ' + (e.reason && e.reason.stack ? e.reason.stack : String(e.reason)) + '\n\n';
+        });
+      </script>
       <script type="module" src="/src/main.tsx"></script>
       
     </body>

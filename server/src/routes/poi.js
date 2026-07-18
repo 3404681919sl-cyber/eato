@@ -20,7 +20,7 @@ router.get("/search", async (req, res) => {
     const url = new URL("https://restapi.amap.com/v3/place/text");
     url.searchParams.set("key", AMAP_KEY);
     url.searchParams.set("keywords", keyword);
-    url.searchParams.set("types", "餐饮服务"); // 限定餐饮，返回门头照/logo
+    url.searchParams.set("types", "050000"); // 高德 POI 类型编码：餐饮服务
     url.searchParams.set("offset", "6");
     url.searchParams.set("extensions", "all");
 
