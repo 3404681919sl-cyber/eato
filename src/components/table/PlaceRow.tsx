@@ -25,9 +25,19 @@ export default function PlaceRow({ place, visit, vi, isDealOpen, onToggleDeal, o
       {/* Restaurant name + image */}
       <div className='flex items-center gap-3'>
         <PlaceAvatar place={place} sizePx={36} />
-        <div className='min-w-0'>
+        <div className='min-w-0 flex-1'>
           <EditableField value={place.name} onChange={(v) => onMutPlace(place.id, { name: v })} placeholder='餐厅名称' />
         </div>
+        {vi === 0 && (
+          <button type='button'
+            title={isDealOpen ? '收起比价' : '查优惠'}
+            onClick={onToggleDeal}
+            className={'w-6 h-6 rounded-lg flex items-center justify-center transition-colors shrink-0 '
+              + (isDealOpen ? 'text-white' : 'bg-muted text-muted-foreground hover:bg-secondary')}
+            style={isDealOpen ? { backgroundColor: '#BF4E2A' } : {}}>
+            {isDealOpen ? <ChevronUp className='w-3 h-3' /> : <BadgePercent className='w-3 h-3' />}
+          </button>
+        )}
       </div>
 
       {/* Stars */}
@@ -83,8 +93,11 @@ export default function PlaceRow({ place, visit, vi, isDealOpen, onToggleDeal, o
 
       {/* Actions */}
       <div className='flex items-center gap-1 pt-1'>
-        <button type='button' title='设为当前时间' onClick={() => onMutVisit(place.id, visit.id, { checkedIn: !visit.checkedIn })}
-          className={'w-6 h-6 rounded-lg flex items-center justify-center transition-colors ' + (visit.checkedIn ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground hover:bg-secondary')}>
+        <button type='button'
+          title={visit.checkedIn ? '取消打卡' : '打卡'}
+          onClick={() => onMutVisit(place.id, visit.id, { checkedIn: !visit.checkedIn })}
+          className={'w-6 h-6 rounded-lg flex items-center justify-center transition-colors '
+            + (visit.checkedIn ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-muted text-muted-foreground hover:bg-secondary')}>
           <Check className='w-3 h-3' />
         </button>
         {vi === 0 && (
@@ -93,13 +106,6 @@ export default function PlaceRow({ place, visit, vi, isDealOpen, onToggleDeal, o
             <Plus className='w-3 h-3' />
           </button>
         )}
-        <button type='button'
-          onClick={onToggleDeal}
-          className={'w-6 h-6 rounded-lg flex items-center justify-center transition-colors '
-            + (isDealOpen ? 'text-white' : 'bg-muted text-muted-foreground hover:bg-secondary')}
-          style={isDealOpen ? { backgroundColor: '#BF4E2A' } : {}}>
-          {isDealOpen ? <ChevronUp className='w-3 h-3' /> : <BadgePercent className='w-3 h-3' />}
-        </button>
       </div>
     </div>
   );

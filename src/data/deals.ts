@@ -24,11 +24,12 @@ export function generateDeals(category: Category): DealsResult {
   ];
   var deals = baseDeals.map((d) => ({ ...d, isBest: d.price === minP }));
   var bestPlatform = deals.find((d) => d.isBest)!.platform;
-  var finalPrice = Math.round(minP * 0.92);
-  var stackSuggestion = bestPlatform === 'douyin'
-    ? '先在抖音购买团购券（¥' + douyinP + '），再叠加平台新用户优惠券（-¥' + Math.round(douyinP * 0.08) + '），最终到手约 ¥' + finalPrice
-    : '先买' + PLATFORMS[bestPlatform].name + '套餐券（¥' + minP + '），再用平台会员折扣 8.5 折，最终到手约 ¥' + finalPrice;
-  return { deals, bestStack: stackSuggestion, saving: Math.round(base - finalPrice), finalPrice };
+  var bestName = PLATFORMS[bestPlatform].name;
+  // 最严谨：最优到手价就是当前列表里的最低价，不虚构叠加优惠
+  var finalPrice = minP;
+  var saving = base - minP;
+  var stackSuggestion = '当前最低价在' + bestName + '（¥' + minP + '），可直接购买';
+  return { deals, bestStack: stackSuggestion, saving, finalPrice };
 }
 
 export function getPlatformDealUrl(platform: string, placeName: string, category: Category): string {

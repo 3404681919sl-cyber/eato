@@ -50,14 +50,14 @@ export const CAT: Record<Category, CategoryConfig> = {
 };
 
 export const CATEGORY_IMAGES: Record<string, string> = {
-  hotpot: "/brands/category-hotpot.png",
-  sushi: "/brands/category-sushi.png",
-  noodles: "/brands/category-noodles.png",
-  cafe: "/brands/category-cafe.png",
-  western: "/brands/category-western.png",
-  bbq: "/brands/category-bbq.png",
-  local: "/brands/category-local.png",
-  other: "/brands/category-other.png",
+  hotpot: "/brands/category-hotpot.svg",
+  sushi: "/brands/category-sushi.svg",
+  noodles: "/brands/category-noodles.svg",
+  cafe: "/brands/category-cafe.svg",
+  western: "/brands/category-western.svg",
+  bbq: "/brands/category-bbq.svg",
+  local: "/brands/category-local.svg",
+  other: "/brands/category-other.svg",
 };
 
 // ── Mood config ──
@@ -71,14 +71,14 @@ export const MOOD: Record<Mood, MoodConfig> = {
 };
 
 // ── Platform config ──
-export type PlatformConfig = { name: string; color: string; bg: string; textColor: string };
+export type PlatformConfig = { name: string; logo: string; color: string; bg: string; textColor: string };
 
 export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
-  meituan:  { name: "美团",     color: "#FFCC00", bg: "#FFFBE6", textColor: "#664D00" },
-  douyin:   { name: "抖音",     color: "#161823", bg: "#F0F0F2", textColor: "#161823" },
-  dianping: { name: "大众点评", color: "#FC5531", bg: "#FFF0ED", textColor: "#C03010" },
-  taobao:   { name: "淘宝闪购", color: "#FF4400", bg: "#FFF3EE", textColor: "#C03010" },
-  xianyu:   { name: "闲鱼",     color: "#00B8C8", bg: "#E8FAFC", textColor: "#007080" },
+  meituan:  { name: "美团",     logo: "美", color: "#FFCC00", bg: "#FFFBE6", textColor: "#664D00" },
+  douyin:   { name: "抖音",     logo: "抖", color: "#161823", bg: "#F0F0F2", textColor: "#161823" },
+  dianping: { name: "大众点评", logo: "大", color: "#FC5531", bg: "#FFF0ED", textColor: "#C03010" },
+  taobao:   { name: "淘宝闪购", logo: "淘", color: "#FF4400", bg: "#FFF3EE", textColor: "#C03010" },
+  xianyu:   { name: "闲鱼",     logo: "闲", color: "#00B8C8", bg: "#E8FAFC", textColor: "#007080" },
 };
 
 export const PLATFORM_KEYS: PlatformId[] = ["meituan","douyin","dianping","taobao","xianyu"];

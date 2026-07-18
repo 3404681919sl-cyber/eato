@@ -50,15 +50,18 @@ export default function TableView({ places, setPlaces }: { places: Place[]; setP
             {place.visits.map((visit, vi) => (
               <PlaceRow
                 key={visit.id} place={place} visit={visit} vi={vi}
-                isDealOpen={expandedDeals === visit.id}
-                onToggleDeal={() => setExpandedDeals(expandedDeals === visit.id ? null : visit.id)}
+                isDealOpen={expandedDeals === place.id}
+                onToggleDeal={() => setExpandedDeals(expandedDeals === place.id ? null : place.id)}
                 onMutPlace={mutPlace}
                 onMutVisit={mutVisit}
                 onAddVisit={addVisit}
               />
             ))}
-            {expandedDeals && places.find(p => p.visits.some(v => v.id === expandedDeals))?.id === place.id && (
+            {expandedDeals === place.id && (
               <div className='border-b border-border/40' style={{ backgroundColor: '#BF4E2A0D' }}>
+                <div className='px-5 py-3 border-b border-border/40'>
+                  <h3 className='text-sm font-semibold text-foreground'>为 <span style={{ color: '#BF4E2A' }}>{place.name}</span> 查找优惠</h3>
+                </div>
                 <DealsPanel placeName={place.name} category={place.category} onClose={() => setExpandedDeals(null)} />
               </div>
             )}

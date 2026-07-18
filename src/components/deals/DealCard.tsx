@@ -41,6 +41,10 @@ export default function DealCard({ deal, category, categoryImg, dealUrl }: DealC
         </div>
         <div className='flex-1 min-w-0'>
           <div className='flex items-center gap-2 mb-1.5'>
+            <div className='w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold'
+              style={{ backgroundColor: p.bg, color: p.textColor }}>
+              {p.logo}
+            </div>
             <span className='text-xs font-bold px-2.5 py-1 rounded-lg'
               style={{ backgroundColor: p.color + '20', color: p.textColor }}>
               {p.name}
