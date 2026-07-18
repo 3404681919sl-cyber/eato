@@ -99,8 +99,6 @@ function generateDeals(category: Category): DealsResult {
 
   const prices = [meituanP, douyinP, dianpingP, taobaoP, xianyuP];
   const minP = Math.min(...prices);
-  const saving = Math.round(base - minP);
-  const finalPrice = Math.round(minP * 0.92); // stacking extra coupon
 
   const deals: Deal[] = [
     { platform: "meituan",  description: "双人套餐 含2饮料",      price: meituanP,  originalPrice: base,  tag: meituanP  === minP ? "最低价" : undefined },
@@ -110,12 +108,10 @@ function generateDeals(category: Category): DealsResult {
     { platform: "xianyu",   description: "转让未使用套餐券",       price: xianyuP,   originalPrice: base,  tag: xianyuP   === minP ? "最低价" : "限时" },
   ].map((d) => ({ ...d, isBest: d.price === minP }));
 
-  const bestPlatform = deals.find((d) => d.isBest)!.platform;
-  const stackSuggestion = bestPlatform === "douyin"
-    ? `先在抖音购入团购券（¥${douyinP}），再叠加平台新用户优惠券（-¥${Math.round(douyinP * 0.08)}），最终到手约 ¥${finalPrice}`
-    : `先买${PLATFORMS[bestPlatform].name}套餐券（¥${minP}），再用平台会员折扣 8.5 折，最终到手约 ¥${finalPrice}`;
+  const bestDeal = deals.find((d) => d.isBest)!;
+  const stackSuggestion = `当前最低价为 ${PLATFORMS[bestDeal.platform].name}（¥${bestDeal.price}），可直接购买。`;
 
-  return { deals, bestStack: stackSuggestion, saving: Math.round(base - finalPrice), finalPrice };
+  return { deals, bestStack: stackSuggestion, saving: Math.round(base - minP), finalPrice: minP };
 }
 
 const DAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
@@ -571,7 +567,7 @@ function AuthPage({ onSuccess }: { onSuccess: () => void }) {
 
 // ─── Deals Panel (expanded tr) ───────────────────────────────────────────────
 
-function DealsPanel({ category, onClose }: { category: Category; onClose: () => void }) {
+function DealsPanel({ category, placeName, onClose }: { category: Category; placeName: string; onClose: () => void }) {
   const [status, setStatus] = useState<DealStatus>("idle");
   const [result, setResult] = useState<DealsResult | null>(null);
 
@@ -625,18 +621,21 @@ function DealsPanel({ category, onClose }: { category: Category; onClose: () => 
         {result.deals.map((deal) => {
           const p = PLATFORMS[deal.platform];
           const disc = Math.round(((deal.originalPrice - deal.price) / deal.originalPrice) * 100);
-          // mock URL per platform
+          // search URL per platform with current restaurant name
           const urls: Record<string, string> = {
-            meituan: "https://meituan.com", douyin: "https://douyin.com",
-            dianping: "https://dianping.com", taobao: "https://taobao.com", xianyu: "https://xianyu.com",
+            meituan: `https://s.meituan.com/${encodeURIComponent(placeName)}`,
+            douyin: `https://www.douyin.com/search/${encodeURIComponent(placeName)}`,
+            dianping: `https://www.dianping.com/search/keyword/${encodeURIComponent(placeName)}`,
+            taobao: `https://s.taobao.com/search?q=${encodeURIComponent(placeName)}`,
+            xianyu: `https://s.ershou.taobao.com/search.htm?q=${encodeURIComponent(placeName)}`,
           };
           return (
             <div key={deal.platform}
-              className={`flex items-center gap-3 rounded-xl px-4 py-2.5 border transition-all ${deal.isBest ? "ring-1" : ""}`}
+              className={`flex items-center gap-3 rounded-xl px-4 py-2.5 border transition-all ${deal.isBest ? "ring-2" : ""}`}
               style={{
                 backgroundColor: deal.isBest ? p.bg : "rgba(242,233,213,0.25)",
-                borderColor: deal.isBest ? p.color + "60" : "rgba(150,100,50,0.12)",
-                boxShadow: deal.isBest ? `0 0 0 1px ${p.color}40` : undefined,
+                borderColor: deal.isBest ? p.color : "rgba(150,100,50,0.12)",
+                boxShadow: deal.isBest ? `0 0 0 2px ${p.color}30` : undefined,
               }}>
               {/* Platform badge */}
               <div className="flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold min-w-[68px] text-center"
@@ -685,12 +684,6 @@ function DealsPanel({ category, onClose }: { category: Category; onClose: () => 
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-primary mb-0.5">AI 智能叠券建议</p>
           <p className="text-xs text-muted-foreground leading-relaxed">{result.bestStack}</p>
-        </div>
-        <div className="flex-shrink-0 text-right">
-          <p className="text-xs text-muted-foreground">可节省</p>
-          <p className="text-lg font-bold leading-tight" style={{ color: "#BF4E2A", fontFamily: "DM Mono, monospace" }}>
-            ¥{result.saving}
-          </p>
         </div>
       </div>
 
@@ -905,7 +898,8 @@ function TableView({ places, setPlaces }: { places: Place[]; setPlaces: React.Di
                   {/* Check-in */}
                   <td className="px-4 py-3 text-center">
                     <button type="button" onClick={() => mutVisit(place.id, visit.id, { checkedIn: !checked })}
-                      className={`w-7 h-7 rounded-full border-2 flex items-center justify-center mx-auto transition-all duration-200 ${checked ? "border-primary bg-primary text-primary-foreground scale-110" : "border-border hover:border-primary/60"}`}>
+                      title={checked ? "点击取消打卡" : "点击打卡"}
+                      className={`w-7 h-7 rounded-full border-2 flex items-center justify-center mx-auto transition-all duration-200 ${checked ? "border-primary bg-primary text-primary-foreground scale-110" : "border-border hover:border-primary/60 hover:bg-primary/5"}`}>
                       {checked && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
                     </button>
                   </td>
@@ -952,6 +946,7 @@ function TableView({ places, setPlaces }: { places: Place[]; setPlaces: React.Di
                     <td colSpan={9} className="px-4" style={{ backgroundColor: "rgba(242,233,213,0.2)" }}>
                       <DealsPanel
                         category={place.category}
+                        placeName={place.name}
                         onClose={() => setExpandedDeals(null)}
                       />
                     </td>
