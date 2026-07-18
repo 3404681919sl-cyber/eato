@@ -3,6 +3,7 @@
 // ── App branding ──
 export const APP_NAME = "Eato";
 export const APP_TAGLINE = "你的智能美食旅行规划助手";
+export const APP_VERSION = "1.0.0";
 export const APP_DESC = "和朋友一起打卡收藏的餐厅，安排聚餐时间，分析消费习惯。让每一顿都值得期待。";
 export const APP_FONT = "'DM Sans', sans-serif";
 export const APP_FONT_SERIF = "'Playfair Display', serif";
@@ -10,9 +11,9 @@ export const APP_FONT_MONO = "'DM Mono', monospace";
 
 // ── Brand colors ──
 export const BRAND = {
-  primary: "#7C3AED",
-  primaryLight: "#8B5CF6",
-  primaryDark: "#5B21B6",
+  primary: "#BF4E2A",
+  primaryLight: "#E8963C",
+  primaryDark: "#A04000",
   accent: "#BF4E2A",
   success: "#16A34A",
   warning: "#D97706",
@@ -92,20 +93,22 @@ export const HOURS = Array.from({ length: 24 }, (_, i) => {
 }).slice(0, 24);
 
 export const INTERVALS: IntervalDef[] = [
-  { label: "午餐",   start: "11:00", end: "14:00", color: "#7C3AED", icon: "☀️" },
+  { label: "午餐",   start: "11:00", end: "14:00", color: "#BF4E2A", icon: "☀️" },
   { label: "下午茶", start: "14:00", end: "17:00", color: "#D97706", icon: "🍵" },
   { label: "晚餐",   start: "17:00", end: "21:30", color: "#2563EB", icon: "🌙" },
 ];
 
 // ── Users ──
 export const USERS = [
-  { id: "a", name: "小美", color: "#7C3AED" },
+  { id: "a", name: "小美", color: "#BF4E2A" },
   { id: "b", name: "阿帅", color: "#2563EB" },
   { id: "c", name: "阿豪", color: "#16A34A" },
 ];
 
 // ── Chart ──
-export const PIE_COLORS = ["#7C3AED", "#E8963C", "#7DC88A", "#6B8FD9", "#A78BFA", "#FB7185"];
+export const PIE_COLORS = ["#BF4E2A", "#E8963C", "#7DC88A", "#6B8FD9", "#A78BFA", "#FB7185"];
 
 // ── Months ──
 export const MONTHS = ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
+
+

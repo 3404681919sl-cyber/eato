@@ -6,74 +6,110 @@
 
 | 功能 | 说明 |
 |------|------|
-| 🏠 **打卡表** | 收藏想去的餐厅，记录每次打卡评价和花费 |
-| 📅 **约饭日历** | 和朋友标记空闲时间，轻松安排聚餐 |
-| 📊 **数据分析** | 可视化消费趋势、品类偏好、约饭搭档统计 |
-| 💰 **智能比价** | 一键对比美团、抖音、大众点评等平台优惠 |
-| 👥 **多人协作** | 多用户空闲时间合并，自动计算最佳约饭时段 |
+| 🏠 **打卡表** | 收藏想去的餐厅，记录每次打卡评价和花费，支持评分/分类/心情标记 |
+| 📅 **约饭日历** | 和朋友标记空闲时间，轻松安排聚餐，支持时段筛选（午餐/下午茶/晚餐） |
+| 📊 **数据分析** | 可视化消费趋势、品类偏好、心情分布、评分分布、约饭搭档统计 |
+| 💰 **智能比价** | 一键对比美团、抖音、大众点评、淘宝闪购、闲鱼等平台优惠，含真实跳转链接 |
+| 👥 **多人协作** | 多用户（小美/阿帅/阿豪）空闲时间合并，自动计算最佳约饭时段 |
+| ⚙️ **数据管理** | 导出备份/重置数据/编辑餐厅信息 |
+| 📤 **导出CSV** | 导出打卡数据为CSV文件，兼容Excel/Numbers（含中文BOM） |
+| 👫 **好友邀请** | 生成邀请码分享给好友 |
+
+## 🏗️ 技术栈
+
+| 层 | 技术 |
+|-----|------|
+| **前端框架** | React 18 + TypeScript |
+| **构建工具** | Vite 6 |
+| **样式** | Tailwind CSS 4 + shadcn/ui |
+| **图表** | Recharts 2 |
+| **图标** | Lucide React |
+| **后端** | Express (API 骨架) |
+| **状态持久化** | localStorage |
 
 ## 🚀 快速开始
 
 ### 环境要求
 - Node.js >= 18
-- pnpm（推荐）或 npm
+- npm（推荐）
 
-### 安装依赖
-\\\ash
-# 前端
-pnpm install
+### 安装 & 运行
 
-# 后端（可选，仅比价功能需要）
+```bash
+# 1. 克隆项目
+git clone https://github.com/3404681919sl-cyber/eato.git
+cd eato
+
+# 2. 安装前端依赖
+npm install
+
+# 3. 安装后端依赖（可选，比价功能需要）
 cd server && npm install && cd ..
-\\\
 
-### 启动开发服务器
-\\\ash
-# 同时启动前端 + 后端
-pnpm dev:all
+# 4. 启动开发（仅前端）
+npm run dev
 
-# 或分别启动
-pnpm dev          # 前端 (http://localhost:5173)
-cd server && npm run dev   # 后端API (http://localhost:3001)
-\\\
+# 5. 前后端同时启动（需要后端依赖已安装）
+npm run dev:all
+```
 
-### 构建
-\\\ash
-pnpm build
-\\\
+访问 http://localhost:5173 即可看到应用。
 
 ## 📁 项目结构
 
-\\\
-src/
-├── app/App.tsx              # 主应用壳（精简后 ~80行）
-├── components/
-│   ├── landing/LandingPage.tsx   # 首页
-│   ├── auth/AuthPage.tsx         # 登录/注册
-│   ├── table/TableView.tsx       # 打卡表
-│   ├── calendar/CalendarView.tsx # 约饭日历
-│   ├── analytics/AnalyticsView.tsx # 数据分析
-│   └── deals/DealsPanel.tsx      # 比价面板
-├── types/index.ts           # TypeScript 类型定义
-├── constants/index.ts       # 配置常量
-├── data/index.ts            # 种子数据 + 比价逻辑
-├── hooks/usePersistState.ts # 数据持久化 Hook
-└── utils/index.ts           # 通用 UI 组件 (StarRow, MoodPicker...)
+```
+eato/
+├── src/                          # 前端源码
+│   ├── app/App.tsx               # 应用入口
+│   ├── components/               # UI组件
+│   │   ├── analytics/            # 数据分析（6个图表组件）
+│   │   ├── auth/                 # 登录页
+│   │   ├── calendar/             # 约饭日历（Header/Grid/Legend）
+│   │   ├── deals/                # 比价面板（Idle/Loading/Card/Best）
+│   │   ├── export/               # 导出CSV
+│   │   ├── forms/                # 表单（加店/编辑/个人资料）
+│   │   ├── invite/               # 好友邀请
+│   │   ├── landing/              # 落地页（Hero/Features/CTA）
+│   │   ├── settings/             # 设置页（数据管理/关于）
+│   │   └── table/                # 打卡表（SearchAdd/Row/Field）
+│   ├── constants/                # 常量配置
+│   ├── data/                     # Mock数据
+│   ├── hooks/                    # 自定义Hooks
+│   ├── types/                    # TypeScript类型定义
+│   └── utils/                    # 工具函数（format/helpers/id）
+├── server/                       # 后端
+│   └── src/
+│       ├── config/               # 平台配置
+│       ├── data/                 # Mock数据
+│       ├── middleware/           # 中间件（logger/errorHandler）
+│       ├── models/               # 数据模型
+│       ├── routes/               # API路由（deals/restaurants/users/analytics/calendar）
+│       └── services/             # 业务逻辑
+└── public/brands/                # 品牌图片
+```
 
-server/
-└── src/index.js             # 后端 API 服务（比价/优惠查询）
-\\\
+## 🔌 API 端点
 
-## 🔌 API 对接说明
+详见 [API_DOCS.md](./API_DOCS.md)。
 
-比价功能目前使用智能模拟数据 + 真实深链跳转。要接入真实电商平台价格，需要：
+| 端点 | 说明 |
+|------|------|
+| `GET /api/health` | 健康检查 |
+| `GET /api/deals?place=&category=` | 比价查询 |
+| `GET /api/deals/platforms` | 平台列表 |
+| `GET/POST /api/restaurants` | 餐厅CRUD |
+| `GET/POST /api/users` | 用户查询/创建 |
+| `GET /api/analytics/overview` | 聚合统计 |
+| `GET /api/calendar/slots` | 日历slot查询 |
 
-1. **淘宝联盟** (https://pub.alimama.com/) — 获取商品搜索 API
-2. **京东联盟** (https://union.jd.com/) — 获取商品价格 API
+## 📐 项目约定
 
-在 \server/src/index.js\ 中搜索 \TODO: Real API\ 查看集成指南。
+- **主题色**: 橙色系（#BF4E2A）
+- **包管理**: npm（不要切换为 pnpm）
+- **分支**: 开发在 `feature/codex-work`，`main` 为稳定版
+- **构建**: `npm run build` 包含 TypeScript 类型检查（tsc -b）
+- **测试**: `npm test` 运行 vitest 单元测试
 
-## 🎨 设计
+## 📄 开源协议
 
-本项目基于 Figma 设计稿构建，使用 Tailwind CSS 4 实现视觉效果。
-Figma 设计源文件：https://www.figma.com/design/GimyFO0CYDp3uFLcQ9xdUx/Dining-and-Travel-Planner-App
+MIT
