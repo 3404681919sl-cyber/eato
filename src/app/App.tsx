@@ -782,7 +782,7 @@ function TableView({ places, setPlaces }: { places: Place[]; setPlaces: React.Di
                 { l: "日期 & 时间", w: "w-36" }, { l: "待打卡点", w: "w-60" }, { l: "心情", w: "w-24" },
                 { l: "拟定菜单", w: "w-48" },
                 { l: "优惠比对", w: "w-28" },
-                { l: "✓ 打卡", w: "w-16 text-center" },
+                { l: "✓ 打卡", w: "w-20 text-center" },
                 { l: "花费 (元)", w: "w-24" }, { l: "评价留言", w: "" }, { l: "+", w: "w-10 text-center" },
               ].map(({ l, w }) => (
                 <th key={l} className={`px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider ${w}`}
