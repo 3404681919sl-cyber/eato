@@ -3,7 +3,7 @@ import {
   Star, Check, Plus, MapPin, BarChart2, Calendar, Search,
   Utensils, Clock, ChevronDown, Heart, Users, LogIn,
   TrendingUp, Wallet, Target, ArrowRight, Sparkles, Zap,
-  ExternalLink, BadgePercent, ChevronUp, Loader2,
+  ExternalLink, BadgePercent, ChevronUp, Loader2, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
@@ -970,18 +970,73 @@ function TableView({ places, setPlaces }: { places: Place[]; setPlaces: React.Di
 
 // ─── Calendar View ────────────────────────────────────────────────────────────
 
+function getMonday(d: Date): Date {
+  const date = new Date(d);
+  const day = date.getDay(); // 0 = Sunday, 1 = Monday, ...
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  date.setDate(diff);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function formatDateLabel(d: Date): string {
+  return `${d.getMonth() + 1}月${d.getDate()}日`;
+}
+
+function formatDateShort(d: Date): string {
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
 function CalendarView({ slots, setSlots }: { slots: Record<string, string[]>; setSlots: React.Dispatch<React.SetStateAction<Record<string, string[]>>> }) {
   const [currentUser, setCurrentUser] = useState("a");
   const [interval, setInterval] = useState<30 | 60>(60);
+  const [weekStart, setWeekStart] = useState<Date>(() => getMonday(new Date()));
+
+  const weekDays = useMemo(() => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(weekStart);
+      d.setDate(weekStart.getDate() + i);
+      days.push({ label: DAYS[i], date: d });
+    }
+    return days;
+  }, [weekStart]);
+
+  const weekRangeText = useMemo(() => {
+    const end = new Date(weekStart);
+    end.setDate(weekStart.getDate() + 6);
+    const sameMonth = weekStart.getMonth() === end.getMonth();
+    return `${weekStart.getFullYear()}年${weekStart.getMonth() + 1}月${weekStart.getDate()}日 - ${sameMonth ? "" : end.getMonth() + 1 + "月"}${end.getDate()}日`;
+  }, [weekStart]);
 
   const timeSlots = useMemo(() => {
     const result: string[] = [];
-    for (let h = 10; h <= 21; h++) {
+    for (let h = 0; h < 24; h++) {
       result.push(`${h}:00`);
-      if (interval === 30 && h < 21) result.push(`${h}:30`);
+      if (interval === 30) result.push(`${h}:30`);
     }
     return result;
   }, [interval]);
+
+  const hourHasSelection = useMemo(() => {
+    const set = new Set<number>();
+    Object.entries(slots).forEach(([key, users]) => {
+      if (!users || users.length === 0) return;
+      const time = key.split("_")[1];
+      if (!time) return;
+      const h = parseInt(time.split(":")[0], 10);
+      if (!Number.isNaN(h)) set.add(h);
+    });
+    return set;
+  }, [slots]);
+
+  const rowHeight = (time: string) => {
+    const h = parseInt(time.split(":")[0], 10);
+    const selected = hourHasSelection.has(h);
+    const active = h >= 7;
+    if (active || selected) return interval === 30 ? "h-6" : "h-10";
+    return "h-4"; // compressed off-peak hours
+  };
 
   const toggle = (day: string, time: string) => {
     const key = `${day}_${time}`;
@@ -1000,7 +1055,17 @@ function CalendarView({ slots, setSlots }: { slots: Record<string, string[]>; se
       .slice(0, 3);
   }, [slots]);
 
-  const cellHeight = interval === 30 ? "h-6" : "h-10";
+  const goPrevWeek = () => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() - 7);
+    setWeekStart(d);
+  };
+  const goNextWeek = () => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + 7);
+    setWeekStart(d);
+  };
+  const goThisWeek = () => setWeekStart(getMonday(new Date()));
 
   return (
     <div>
@@ -1009,9 +1074,23 @@ function CalendarView({ slots, setSlots }: { slots: Record<string, string[]>; se
           <h2 className="text-3xl font-bold text-foreground leading-tight" style={{ fontFamily: "Playfair Display, serif" }}>
             约饭时间协调
           </h2>
-          <p className="text-sm text-muted-foreground mt-1.5">点击格子选择你有空的时间，颜色越深代表重叠人数越多 ✨</p>
+          <p className="text-sm text-muted-foreground mt-1.5">
+            {weekRangeText} · 点击格子选择你有空的时间，颜色越深代表重叠人数越多 ✨
+          </p>
         </div>
         <div className="flex items-center gap-3">
+          {/* Week navigator */}
+          <div className="flex items-center rounded-xl border border-border overflow-hidden text-xs">
+            <button type="button" onClick={goPrevWeek} className="px-2.5 py-1.5 text-muted-foreground hover:bg-secondary transition-colors" title="上一周">
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <button type="button" onClick={goThisWeek} className="px-3 py-1.5 font-medium text-muted-foreground hover:bg-secondary transition-colors border-x border-border">
+              今天
+            </button>
+            <button type="button" onClick={goNextWeek} className="px-2.5 py-1.5 text-muted-foreground hover:bg-secondary transition-colors" title="下一周">
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
           {/* Interval toggle */}
           <div className="flex rounded-xl border border-border overflow-hidden text-xs">
             {([30, 60] as const).map((iv) => (
@@ -1039,10 +1118,14 @@ function CalendarView({ slots, setSlots }: { slots: Record<string, string[]>; se
         <div className="mb-5 flex gap-3 flex-wrap">
           {hotSlots.map(([key, users]) => {
             const [day, time] = key.split("_");
+            const dayIndex = DAYS.indexOf(day);
+            const date = dayIndex >= 0 ? weekDays[dayIndex] : null;
             return (
               <div key={key} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm"
                 style={{ backgroundColor: "#BF4E2A12", border: "1px solid #BF4E2A30" }}>
-                <span className="text-primary font-semibold">{day} {time}</span>
+                <span className="text-primary font-semibold">
+                  {date ? formatDateLabel(date.date) : day} {day} {time}
+                </span>
                 <div className="flex gap-0.5">
                   {users.map((uid) => {
                     const u = USERS.find((x) => x.id === uid)!;
@@ -1063,9 +1146,12 @@ function CalendarView({ slots, setSlots }: { slots: Record<string, string[]>; se
           {/* Header row */}
           <div className="grid border-b border-border sticky top-0 bg-card z-10" style={{ gridTemplateColumns: "64px repeat(7, 1fr)" }}>
             <div className="p-3" />
-            {DAYS.map((day) => (
-              <div key={day} className="p-3 text-center border-l border-border">
-                <p className="text-xs font-bold text-foreground">{day}</p>
+            {weekDays.map((day) => (
+              <div key={day.label} className="p-3 text-center border-l border-border">
+                <p className="text-xs font-bold text-foreground">{day.label}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5" style={{ fontFamily: "DM Mono, monospace" }}>
+                  {formatDateShort(day.date)}
+                </p>
               </div>
             ))}
           </div>
@@ -1074,7 +1160,7 @@ function CalendarView({ slots, setSlots }: { slots: Record<string, string[]>; se
           {timeSlots.map((time) => (
             <div key={time} className={`grid border-b border-border/40`} style={{ gridTemplateColumns: "64px repeat(7, 1fr)" }}>
               {/* Time label */}
-              <div className={`flex items-center justify-end pr-3 ${cellHeight}`}>
+              <div className={`flex items-center justify-end pr-3 ${rowHeight(time)}`}>
                 <span className="text-[11px] text-muted-foreground leading-none"
                   style={{ fontFamily: "DM Mono, monospace" }}>
                   {time}
@@ -1105,7 +1191,7 @@ function CalendarView({ slots, setSlots }: { slots: Record<string, string[]>; se
 
                 return (
                   <button key={day} type="button" onClick={() => toggle(day, time)}
-                    className={`${cellHeight} border-l border-border/40 relative transition-all hover:opacity-80 group`}
+                    className={`${rowHeight(time)} border-l border-border/40 relative transition-all hover:opacity-80 group`}
                     style={{ backgroundColor: bg, borderTopColor: border }}>
                     {/* User dots */}
                     {count > 0 && (
