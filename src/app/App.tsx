@@ -118,10 +118,10 @@ function CategoryPicker({ value, onChange, disabled }: { value: Category; onChan
 
 function LandingPage({ onAuth }: { onAuth: () => void }) {
   const photos = [
-    "https://image.pollinations.ai/prompt/chinese%20hotpot%20restaurant%20interior%2C%20warm%20lighting%2C%20food%20photography?width=400&height=500&nologo=true&model=flux",
-    "https://image.pollinations.ai/prompt/ramen%20noodle%20shop%20counter%2C%20japanese%20style%2C%20cozy?width=400&height=500&nologo=true&model=flux",
-    "https://image.pollinations.ai/prompt/sushi%20platter%20on%20wooden%20table%2C%20fresh%20food?width=400&height=500&nologo=true&model=flux",
-    "https://image.pollinations.ai/prompt/cafe%20latte%20art%2C%20cozy%20coffee%20shop?width=400&height=500&nologo=true&model=flux",
+    "https://loremflickr.com/400/500/restaurant?lock=2",
+    "https://loremflickr.com/400/500/ramen?lock=5",
+    "https://loremflickr.com/400/500/sushi?lock=3",
+    "https://loremflickr.com/400/500/coffee?lock=4",
   ];
 
   return (
@@ -149,7 +149,8 @@ function LandingPage({ onAuth }: { onAuth: () => void }) {
         <div className="absolute inset-0 flex">
           {photos.map((src, i) => (
             <div key={i} className="flex-1 relative overflow-hidden">
-              <img src={src} alt="" className="w-full h-full object-cover opacity-30" style={{ filter: "saturate(0.6)" }} />
+              <img src={src} alt="" className="w-full h-full object-cover opacity-30" style={{ filter: "saturate(0.6)" }}
+                onError={(e) => { e.currentTarget.style.display = "none"; }} />
             </div>
           ))}
           {/* Gradient overlays */}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Star, Check } from "lucide-react";
 import type { Category } from "../types";
 import { DISH_DB, CAT } from "../data/catalog";
+import { brandAvatar } from "../utils/avatar";
 
 export function MenuPicker({ category, initial, onConfirm, onClose }: {
   category: Category; initial: string; onConfirm: (dishes: string[]) => void; onClose: () => void;
@@ -30,7 +31,11 @@ export function MenuPicker({ category, initial, onConfirm, onClose }: {
                   <span className="text-4xl opacity-20">{CAT[category].emoji}</span>
                   <img src={d.image} alt={d.name} loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
+                    onError={(e) => {
+                      const el = e.currentTarget;
+                      el.onerror = null;
+                      el.src = brandAvatar(d.emoji, CAT[category].light);
+                    }} />
                   <div className="absolute bottom-1.5 right-1.5 flex items-center gap-0.5 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 shadow-sm">
                     <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
                     <span className="text-[11px] font-bold text-amber-700">{d.rating}</span>
