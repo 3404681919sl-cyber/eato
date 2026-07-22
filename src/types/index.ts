@@ -38,3 +38,6 @@ export type Deal = {
 export type DealsResult = {
   deals: Deal[]; bestStack: string; saving: number; finalPrice: number;
 };
+
+// ── Calendar ──
+export type CalendarSlots = Record<string, string[]>;  // key: "周一_11:00"

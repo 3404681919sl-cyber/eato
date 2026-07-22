@@ -1,0 +1,216 @@
+classDiagram
+    %% ── Data Models ──
+    class AppState {
+        <<enum>>
+        "landing" | "auth" | "app"
+    }
+    class AuthMode {
+        <<enum>>
+        "login" | "signup"
+    }
+    class Tab {
+        <<enum>>
+        "table" | "calendar" | "analytics"
+    }
+    class Category {
+        <<enum>>
+        "hotpot" | "chinese" | "fastfood" | "asian" | "western" | "bbq" | "dessert" | "seafood" | "other"
+    }
+    class Mood {
+        <<enum>>
+        "must" | "excited" | "curious" | "casual"
+    }
+    class Visit {
+        +id: string
+        +date: string
+        +time: string
+        +checkedIn: boolean
+        +spending: string
+        +review: string
+    }
+    class Place {
+        +id: string
+        +name: string
+        +image: string
+        +stars: number
+        +category: Category
+        +mood: Mood
+        +plannedMenu: string
+        +visits: Visit[]
+    }
+    class Dish {
+        +id: string
+        +name: string
+        +image: string
+        +emoji: string
+        +rating: number
+        +reviewCount: number
+        +sentiments: Array~
+        {percent: number; text: string}~
+    }
+    class DealStatus {
+        <<enum>>
+        "idle" | "loading" | "done"
+    }
+    class Deal {
+        +platform: string
+        +description: string
+        +price: number
+        +originalPrice: number
+        +tag?: string
+        +isBest?: boolean
+    }
+    class DealsResult {
+        +deals: Deal[]
+        +bestStack: string
+        +saving: number
+        +finalPrice: number
+    }
+    class CalendarSlots {
+        <<Record>>
+        [key: string]: string[]
+    }
+
+    %% ── Constants / Config ──
+    class CategoryConfig {
+        +label: string
+        +emoji: string
+        +color: string
+        +light: string
+    }
+    class MoodConfig {
+        +label: string
+        +emoji: string
+        +color: string
+    }
+    class PlatformConfig {
+        +name: string
+        +color: string
+        +bg: string
+        +textColor: string
+    }
+    class UserConfig {
+        +id: string
+        +name: string
+        +color: string
+    }
+
+    %% ── Data Service Layer ──
+    class DataService {
+        <<interface>>
+        +getPlaces() Place[]
+        +savePlaces(places: Place[]) void
+        +addPlace(place: Place) Place
+        +updatePlace(id: string, patch: Partial~Place~) Place | null
+        +deletePlace(id: string) boolean
+        +getSlots() CalendarSlots
+        +saveSlots(slots: CalendarSlots) void
+        +toggleSlot(day: string, time: string, userId: string) string[]
+        +searchDeals(placeName: string, category: Category) Promise~DealsResult~
+        +getUsers() UserConfig[]
+        +resetAll() void
+    }
+    class MockDataService {
+        -placesCache: Place[] | null
+        -slotsCache: CalendarSlots | null
+        +getPlaces() Place[]
+        +savePlaces(places: Place[]) void
+        +addPlace(place: Place) Place
+        +updatePlace(id: string, patch: Partial~Place~) Place | null
+        +deletePlace(id: string) boolean
+        +getSlots() CalendarSlots
+        +saveSlots(slots: CalendarSlots) void
+        +toggleSlot(day: string, time: string, userId: string) string[]
+        +searchDeals(placeName: string, category: Category) Promise~DealsResult~
+        +getUsers() UserConfig[]
+        +resetAll() void
+    }
+    class ApiDataService {
+        -base: string
+        +constructor(baseUrl?: string)
+        +getPlaces() Place[]
+        +savePlaces(places: Place[]) void
+        +addPlace(place: Place) Place
+        +updatePlace(id: string, patch: Partial~Place~) Place | null
+        +deletePlace(id: string) boolean
+        +getSlots() CalendarSlots
+        +saveSlots(slots: CalendarSlots) void
+        +toggleSlot(day: string, time: string, userId: string) string[]
+        +searchDeals(placeName: string, category: Category) Promise~DealsResult~
+        +getUsers() UserConfig[]
+        +resetAll() void
+    }
+
+    %% ── Context / Provider ──
+    class DataContextType {
+        +service: DataService
+        +places: Place[]
+        +slots: CalendarSlots
+        +setPlaces(places: Place[] | ((prev: Place[]) => Place[])) void
+        +setSlots(slots: CalendarSlots | ((prev: CalendarSlots) => CalendarSlots)) void
+        +resetAll() void
+        +searchDeals(name: string, cat: Category) Promise~DealsResult~
+    }
+    class DataProvider {
+        +render() ReactNode
+    }
+    class useData {
+        +useData() DataContextType
+    }
+
+    %% ── Component Props ──
+    class StarRowProps {
+        +value: number
+        +onChange(v: number) void
+        +disabled?: boolean
+    }
+    class MoodPickerProps {
+        +value: Mood
+        +onChange(m: Mood) void
+        +disabled?: boolean
+    }
+    class CategoryPickerProps {
+        +value: Category
+        +onChange(c: Category) void
+        +disabled?: boolean
+    }
+    class MenuPickerProps {
+        +category: Category
+        +initial: string
+        +onConfirm(dishes: string[]) void
+        +onClose() void
+    }
+    class DealsPanelProps {
+        +category: Category
+        +placeName: string
+        +onClose() void
+    }
+    class PlaceAvatarProps {
+        +name: string
+        +category: Category
+        +image?: string
+        +checked?: boolean
+        +visitIndex?: number
+    }
+    class TableViewProps {
+        +places: Place[]
+        +setPlaces: Dispatch~SetStateAction~Place[]~~
+    }
+    class CalendarViewProps {
+        +slots: CalendarSlots
+        +setSlots: Dispatch~SetStateAction~CalendarSlots~~
+    }
+    class AnalyticsViewProps {
+        +places: Place[]
+    }
+
+    %% ── Relationships ──
+    MockDataService ..|> DataService : implements
+    ApiDataService ..|> DataService : implements
+    DataProvider --> DataService : uses
+    DataProvider --> DataContextType : creates
+    useData --> DataContextType : returns
+    Place "1" --> "*" Visit : has
+    DealsResult "1" --> "*" Deal : contains
+    "pages/*" --> useData : consumes
+    "components/ui/*" --> "props" : receives

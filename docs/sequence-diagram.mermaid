@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant U as 用户
+    participant M as main.tsx
+    participant R as Router
+    participant DP as DataProvider
+    participant MS as MockDataService
+    participant LS as localStorage
+    participant A as App (AppShell)
+
+    U->>M: 访问页面
+    M->>R: createRoot + render
+    R->>DP: 包裹 <DataProvider>
+    DP->>MS: new MockDataService()
+    MS->>LS: loadJSON("eato_places")
+    LS-->>MS: SEED 数据
+    MS->>MS: 缓存到 placesCache
+    MS->>LS: loadJSON("eato_slots")
+    LS-->>MS: buildSeedCalendar()
+    MS->>MS: 缓存到 slotsCache
+    DP->>DP: useState(service.getPlaces())
+    DP->>DP: useState(service.getSlots())
+    R->>A: <App /> (作为路由出口)
+    A->>A: 初始化路由，展示 LandingPage 或 AppShell
