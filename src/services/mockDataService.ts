@@ -33,7 +33,7 @@ export class MockDataService implements DataService {
     if (!this.placesCache) {
       this.placesCache = loadJSON(STORAGE_KEYS.PLACES, SEED);
     }
-    return this.placesCache;
+    return [...this.placesCache];
   }
 
   savePlaces(places: Place[]): void {
@@ -42,7 +42,7 @@ export class MockDataService implements DataService {
   }
 
   addPlace(place: Place): Place {
-    const places = this.getPlaces();
+    const places = [...this.getPlaces()];
     places.push(place);
     this.savePlaces(places);
     return place;
