@@ -147,7 +147,7 @@ export function PlaceRow({
   onSetMenuPicker, onSetEditingReview, onSetExpandedDeals,
 }: PlaceRowProps) {
   const checked = visit.checkedIn;
-  const cat = CAT[place.category];
+  const cat = CAT[place.category] ?? CAT.other;
 
   const nowTime = () => {
     const d = new Date();

@@ -21,7 +21,7 @@ export default function MoodPicker({ value, onChange, disabled }: MoodPickerProp
     return () => document.removeEventListener("mousedown", h);
   }, [open]);
 
-  const m = MOOD[value];
+  const m = MOOD[value] ?? MOOD.casual;
 
   return (
     <div className="relative" ref={ref}>

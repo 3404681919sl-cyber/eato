@@ -23,6 +23,6 @@ export function resolvePlaceImage(name: string, category: Category, poiPhoto?: s
   if (poiPhoto) return poiPhoto;
   const brand = resolveBrand(name);
   if (brand) return brandAvatar(brand.emoji, brand.color, name.charAt(0));
-  const cat = CAT[category];
+  const cat = CAT[category] ?? CAT.other;
   return brandAvatar(cat.emoji, cat.light);
 }

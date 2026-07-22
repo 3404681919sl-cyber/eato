@@ -28,10 +28,11 @@ export const PLATFORMS: Record<string, { name: string; color: string; bg: string
 };
 
 export function generateDeals(category: Category): DealsResult {
-  const BASE: Record<Category, number> = {
+  const BASE: Record<string, number> = {
     hotpot: 158, chinese: 98, fastfood: 58, asian: 128, western: 248, bbq: 128, dessert: 72, seafood: 188, other: 88,
   };
-  const base = BASE[category];
+  const cat = BASE[category] !== undefined ? category : "other";
+  const base = BASE[cat];
   const r = (lo: number, hi: number) => Math.round(base * lo + Math.random() * base * (hi - lo));
 
   const meituanP  = r(0.72, 0.80);
@@ -51,8 +52,9 @@ export function generateDeals(category: Category): DealsResult {
     { platform: "xianyu",   description: "转让未使用套餐券",       price: xianyuP,   originalPrice: base,  tag: xianyuP   === minP ? "最低价" : "限时" },
   ].map((d) => ({ ...d, isBest: d.price === minP }));
 
-  const bestDeal = deals.find((d) => d.isBest)!;
-  const stackSuggestion = `当前最低价为 ${PLATFORMS[bestDeal.platform].name}（¥${bestDeal.price}），可直接购买。`;
+  const bestDeal = deals.find((d) => d.isBest) ?? deals[0];
+  const bestName = PLATFORMS[bestDeal.platform]?.name ?? bestDeal.platform;
+  const stackSuggestion = `当前最低价为 ${bestName}（¥${bestDeal.price}），可直接购买。`;
 
   return { deals, bestStack: stackSuggestion, saving: Math.round(base - minP), finalPrice: minP };
 }

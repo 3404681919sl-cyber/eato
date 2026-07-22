@@ -227,7 +227,7 @@ export default function TableView({ places, setPlaces }: TableViewProps) {
           <tbody>
             {rows.map(({ place, visit, visitIndex, isLast }) => {
               const checked = visit.checkedIn;
-              const cat = CAT[place.category];
+              const cat = CAT[place.category] ?? CAT.other;
               return (
                 <React.Fragment key={visit.id}>
                   <tr

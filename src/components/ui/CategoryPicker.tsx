@@ -22,7 +22,7 @@ export default function CategoryPicker({ value, onChange, disabled }: CategoryPi
     return () => document.removeEventListener("mousedown", h);
   }, [open]);
 
-  const cat = CAT[value];
+  const cat = CAT[value] ?? CAT.other;
 
   return (
     <div className="relative" ref={ref}>

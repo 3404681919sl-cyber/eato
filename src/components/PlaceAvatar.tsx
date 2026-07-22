@@ -11,7 +11,7 @@ interface PlaceAvatarProps {
 }
 
 export default function PlaceAvatar({ name, category, image, checked, visitIndex }: PlaceAvatarProps) {
-  const cat = CAT[category];
+  const cat = CAT[category] ?? CAT.other;
 
   return (
     <div className="relative flex-shrink-0">
