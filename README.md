@@ -147,6 +147,17 @@ npm run test:watch   # Watch 模式（开发时持续运行）
 
 > 本地预览生产包：`npm run build && npm run preview`（预览服务器带 `/eato/` 基路径）。
 
+### 生产环境：EdgeOne Pages（国内可达主站）
+
+主生产站点部署在腾讯云 EdgeOne Pages，国内直连可达，不依赖 GitHub Pages：
+
+- **访问地址**：<https://eato-deploy-dpox63ngkbdg.edgeone.cool/>
+- 构建产物由 `DEPLOY_BASE=/ npm run build` 生成（根路径，适配 EdgeOne 根目录托管）。
+- 部署方式：将 `dist/` 目录（或 `D:/eato-deploy.zip`）上传至 EdgeOne Pages 控制台，平台自动发布。
+- 可选绑定自定义域名（需自行注册域名后，在 EdgeOne 控制台添加 CNAME 解析）。
+
+> GitHub Pages 地址 <https://3404681919sl-cyber.github.io/eato/> 作为备用镜像保留。
+
 ### 后端：Render（可选，仅 Mock 比价）
 
 比价服务可一键部署到 Render：
