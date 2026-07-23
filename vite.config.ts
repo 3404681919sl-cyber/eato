@@ -5,8 +5,12 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
-  // GitHub Pages serves the site under /eato/ — every asset must be prefixed.
-  base: "/eato/",
+  // Base path is environment-configurable so the same source can deploy to
+// two targets:
+//   - GitHub Pages  → /eato/   (default, set via DEPLOY_BASE)
+//   - EdgeOne Pages → /        (set DEPLOY_BASE=/ for the domestic mirror)
+// Falls back to /eato/ when DEPLOY_BASE is unset, preserving the GitHub build.
+base: process.env.DEPLOY_BASE || "/eato/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
