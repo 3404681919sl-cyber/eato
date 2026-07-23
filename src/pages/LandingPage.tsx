@@ -15,7 +15,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-[#0C0805] text-white overflow-x-hidden" style={{ fontFamily: "DM Sans, sans-serif" }}>
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 py-5">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-10 py-5">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-[#BF4E2A] flex items-center justify-center">
             <MapPin className="w-3.5 h-3.5 text-white" />
@@ -49,7 +49,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-[#0C0805] via-transparent to-[#0C0805]/80" />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-10 pt-24 pb-16">
+        <div className="relative max-w-6xl mx-auto px-6 sm:px-10 pt-24 pb-16">
           <div className="max-w-xl">
             {/* Badge */}
             <div
@@ -61,7 +61,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
             </div>
 
             <h1
-              className="text-[88px] font-bold leading-none mb-4 tracking-tight"
+              className="text-5xl sm:text-7xl lg:text-[88px] font-bold leading-none mb-4 tracking-tight"
               style={{ fontFamily: "Playfair Display, serif" }}
             >
               Eato
@@ -108,7 +108,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
       </section>
 
       {/* Feature strip */}
-      <section className="max-w-6xl mx-auto px-10 py-20 grid grid-cols-3 gap-6">
+      <section className="max-w-6xl mx-auto px-6 sm:px-10 py-20 grid grid-cols-1 sm:grid-cols-3 gap-6">
         {[
           {
             icon: <Utensils className="w-5 h-5" />, color: "#BF4E2A",
@@ -141,7 +141,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
       </section>
 
       {/* Footer CTA */}
-      <section className="text-center py-20 px-10 border-t border-white/5">
+      <section className="text-center py-20 px-6 sm:px-10 border-t border-white/5">
         <p className="text-3xl font-bold mb-2" style={{ fontFamily: "Playfair Display, serif" }}>
           准备好了吗？
         </p>

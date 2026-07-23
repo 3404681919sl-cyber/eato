@@ -1,0 +1,7 @@
+runtime: docker
+healthCheckPath: /api/health
+env:
+  - key: PORT
+    value: "3001"
+  - key: AMAP_KEY
+    sync: false

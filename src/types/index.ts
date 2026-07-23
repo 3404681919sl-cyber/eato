@@ -34,6 +34,10 @@ export type Deal = {
   platform: string; description: string;
   price: number; originalPrice: number;
   tag?: string; isBest?: boolean;
+  platformName?: string;
+  platformColor?: string;
+  discount?: number;
+  deepLink?: string;
 };
 export type DealsResult = {
   deals: Deal[]; bestStack: string; saving: number; finalPrice: number;

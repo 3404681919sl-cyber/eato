@@ -92,8 +92,9 @@ export class MockDataService implements DataService {
     return slots[key] || [];
   }
 
-  async searchDeals(_placeName: string, category: Category): Promise<DealsResult> {
-    return generateDeals(category);
+  async searchDeals(placeName: string, category: Category): Promise<DealsResult> {
+    // Forward the place name so prices are deterministic & store-specific.
+    return generateDeals(placeName, category);
   }
 
   getUsers(): { id: string; name: string; color: string }[] {

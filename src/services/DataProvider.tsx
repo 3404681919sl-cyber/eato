@@ -2,15 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useMemo } from
 import type { Place, Category, DealsResult, CalendarSlots } from "@/types";
 import type { DataService } from "./types";
 import { MockDataService } from "./mockDataService";
-
-/**
- * Toggle this to switch between mock and real API.
- * When your backend is ready, change to `new ApiDataService()`.
- */
-function createService(): DataService {
-  // ⚡ Switch here: new ApiDataService() when backend is ready
-  return new MockDataService();
-}
+import { ApiDataService } from "./apiDataService";
 
 export interface DataContextType {
   service: DataService;
@@ -25,40 +17,62 @@ export interface DataContextType {
 const DataContext = createContext<DataContextType | null>(null);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const serviceRef = useMemo(() => createService(), []);
+  // Local (localStorage) is the single source of truth for restaurants,
+  // calendar and users. All non-deal operations always go through it.
+  const local = useMemo(() => new MockDataService(), []);
 
-  const [places, internalSetPlaces] = useState<Place[]>(() => serviceRef.getPlaces());
-  const [slots, internalSetSlots] = useState<CalendarSlots>(() => serviceRef.getSlots());
+  // Optional back-end, used ONLY for deal comparison when VITE_API_BASE is set.
+  // When absent, `api` is null and deals are served locally (see searchDeals).
+  const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
+  const api = useMemo(() => (apiBase ? new ApiDataService(apiBase) : null), [apiBase]);
+
+  const [places, internalSetPlaces] = useState<Place[]>(() => local.getPlaces());
+  const [slots, internalSetSlots] = useState<CalendarSlots>(() => local.getSlots());
 
   const setPlaces = useCallback((updater: Place[] | ((prev: Place[]) => Place[])) => {
     internalSetPlaces((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
-      serviceRef.savePlaces(next);
+      local.savePlaces(next);
       return next;
     });
-  }, [serviceRef]);
+  }, [local]);
 
   const setSlots = useCallback((updater: CalendarSlots | ((prev: CalendarSlots) => CalendarSlots)) => {
     internalSetSlots((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
-      serviceRef.saveSlots(next);
+      local.saveSlots(next);
       return next;
     });
-  }, [serviceRef]);
+  }, [local]);
 
   const resetAll = useCallback(() => {
-    serviceRef.resetAll();
-    internalSetPlaces(serviceRef.getPlaces());
-    internalSetSlots(serviceRef.getSlots());
-  }, [serviceRef]);
+    local.resetAll();
+    internalSetPlaces(local.getPlaces());
+    internalSetSlots(local.getSlots());
+  }, [local]);
 
+  // Composed deal search: try the back-end first, gracefully fall back to the
+  // local mock generator on ANY failure. It never throws (no white screen).
   const searchDeals = useCallback(async (name: string, cat: Category): Promise<DealsResult> => {
-    return serviceRef.searchDeals(name, cat);
-  }, [serviceRef]);
+    if (api) {
+      try {
+        return await api.searchDeals(name, cat);
+      } catch (e) {
+        console.warn("[deals] 后端失败，回退本地", e);
+      }
+    }
+    return local.searchDeals(name, cat);
+  }, [api, local]);
 
   const value = useMemo(() => ({
-    service: serviceRef, places, slots, setPlaces, setSlots, resetAll, searchDeals,
-  }), [serviceRef, places, slots, setPlaces, setSlots, resetAll, searchDeals]);
+    service: local,
+    places,
+    slots,
+    setPlaces,
+    setSlots,
+    resetAll,
+    searchDeals,
+  }), [local, api, places, slots, setPlaces, setSlots, resetAll, searchDeals]);
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }

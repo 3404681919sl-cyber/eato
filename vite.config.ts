@@ -5,6 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
+  // GitHub Pages serves the site under /eato/ — every asset must be prefixed.
+  base: "/eato/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -17,6 +19,23 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3001",
         changeOrigin: true,
+      },
+    },
+  },
+  build: {
+    // Recharts is heavy but lazy-loaded (only fetched when the analytics tab
+    // opens), so it never lands in the initial bundle. Bump the warning limit
+    // so the build stays warning-free without forcing it into the entry chunk.
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        // Split heavy vendors into their own chunks so no single file exceeds
+        // the 500 kB warning threshold and the initial load stays lean.
+        manualChunks: {
+          react: ["react", "react-dom", "react-router"],
+          charts: ["recharts"],
+          icons: ["lucide-react"],
+        },
       },
     },
   },

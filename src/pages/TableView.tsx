@@ -206,16 +206,16 @@ export default function TableView({ places, setPlaces }: TableViewProps) {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
+      <div className="max-w-full overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
         <table className="w-full" style={{ minWidth: "1220px" }}>
           <thead>
             <tr className="border-b border-border" style={{ backgroundColor: "rgba(242,233,213,0.5)" }}>
               {[
-                { l: "日期 & 时间", w: "w-36" }, { l: "待打卡点", w: "w-60" }, { l: "心情", w: "w-24" },
-                { l: "拟定菜单", w: "w-48" },
+                { l: "日期 & 时间", w: "w-36" }, { l: "待打卡点", w: "w-60" }, { l: "心情", w: "w-24 hidden md:table-cell" },
+                { l: "拟定菜单", w: "w-48 hidden md:table-cell" },
                 { l: "优惠比对", w: "w-28" },
                 { l: "✓ 打卡", w: "w-20 text-center" },
-                { l: "花费 (元)", w: "w-24" }, { l: "评价留言", w: "" }, { l: "+", w: "w-10 text-center" },
+                { l: "花费 (元)", w: "w-24" }, { l: "评价留言", w: "hidden md:table-cell" }, { l: "+", w: "w-10 text-center" },
               ].map(({ l, w }) => (
                 <th key={l} className={`px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider ${w}`}
                   style={{ fontFamily: "DM Mono, monospace" }}>
@@ -283,12 +283,12 @@ export default function TableView({ places, setPlaces }: TableViewProps) {
                     </td>
 
                     {/* Mood */}
-                    <td className={`px-4 py-3 ${checked ? "opacity-35 pointer-events-none" : ""}`}>
+                    <td className={`px-4 py-3 hidden md:table-cell ${checked ? "opacity-35 pointer-events-none" : ""}`}>
                       <MoodPicker value={place.mood} onChange={(m) => mutPlace(place.id, { mood: m })} disabled={checked} />
                     </td>
 
                     {/* Menu */}
-                    <td className={`px-4 py-3 ${checked ? "opacity-35 pointer-events-none" : ""}`}>
+                    <td className={`px-4 py-3 hidden md:table-cell ${checked ? "opacity-35 pointer-events-none" : ""}`}>
                       <button type="button" onClick={() => !checked && setMenuPicker({ placeId: place.id, category: place.category })}
                         className="text-left text-xs text-muted-foreground line-clamp-2 leading-relaxed hover:text-foreground transition-colors w-full">
                         {place.plannedMenu || <span className="italic opacity-40">点击选择菜品…</span>}
@@ -333,7 +333,7 @@ export default function TableView({ places, setPlaces }: TableViewProps) {
                     </td>
 
                     {/* Review */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 hidden md:table-cell">
                       {editingReview === visit.id ? (
                         <input autoFocus value={visit.review} onChange={(e) => mutVisit(place.id, visit.id, { review: e.target.value })}
                           onBlur={() => setEditingReview(null)} onKeyDown={(e) => e.key === "Enter" && setEditingReview(null)}

@@ -1,11 +1,15 @@
 import type { Place, Category, DealsResult, CalendarSlots } from "@/types";
 import type { DataService } from "./types";
 import { API_BASE_URL, USERS } from "@/constants";
+import { generateDeals } from "@/data/catalog";
 
 /**
  * API implementation of DataService.
- * Stub ready for real backend integration.
- * Uncomment the fetch calls when the backend is ready.
+ *
+ * Restaurants / calendar / users intentionally stay on the local (localStorage)
+ * service — only deal comparison is routed to the back-end when VITE_API_BASE
+ * is configured. On any failure the deal search falls back to the local mock
+ * generator instead of throwing, so the UI never whites out.
  */
 export class ApiDataService implements DataService {
   private base: string;
@@ -17,13 +21,12 @@ export class ApiDataService implements DataService {
   // ── Restaurants ──
 
   getPlaces(): Place[] {
-    // TODO: fetch(`${this.base}/api/restaurants`).then(r => r.json())
+    // Restaurants are always served from localStorage.
     console.warn("ApiDataService.getPlaces: using empty fallback");
     return [];
   }
 
   savePlaces(_places: Place[]): void {
-    // TODO: POST/PUT to backend
     console.warn("ApiDataService.savePlaces: not implemented");
   }
 
@@ -63,11 +66,13 @@ export class ApiDataService implements DataService {
   async searchDeals(placeName: string, category: Category): Promise<DealsResult> {
     try {
       const res = await fetch(`${this.base}/api/deals?place=${encodeURIComponent(placeName)}&category=${category}`);
-      if (res.ok) return res.json();
+      if (!res.ok) throw new Error("bad status " + res.status);
+      return await res.json();
     } catch (e) {
-      console.warn("ApiDataService.searchDeals: fetch failed", e);
+      console.warn("[ApiDataService] deals 失败，回退本地生成", e);
+      // Deterministic local fallback — never throw to the UI.
+      return generateDeals(placeName, category);
     }
-    throw new Error("Deal search failed");
   }
 
   // ── Users ──

@@ -4,7 +4,7 @@ import {
 } from "lucide-react";
 import type { Category, DealStatus, DealsResult } from "@/types";
 import { PLATFORMS } from "@/constants";
-import { generateDeals } from "@/data/catalog";
+import { useData } from "@/services/DataProvider";
 
 interface DealsPanelProps {
   category: Category;
@@ -15,13 +15,19 @@ interface DealsPanelProps {
 export default function DealsPanel({ category, placeName, onClose }: DealsPanelProps) {
   const [status, setStatus] = useState<DealStatus>("idle");
   const [result, setResult] = useState<DealsResult | null>(null);
+  const { searchDeals } = useData();
 
-  const search = () => {
+  const search = async () => {
     setStatus("loading");
-    setTimeout(() => {
-      setResult(generateDeals(category));
+    try {
+      const data = await searchDeals(placeName, category);
+      setResult(data);
       setStatus("done");
-    }, 1600);
+    } catch (e) {
+      // searchDeals already falls back locally, but guard against any surprise.
+      console.warn("[DealsPanel] 比价失败", e);
+      setStatus("idle");
+    }
   };
 
   if (status === "idle") {
@@ -149,6 +155,11 @@ export default function DealsPanel({ category, placeName, onClose }: DealsPanelP
           <p className="text-xs text-muted-foreground leading-relaxed">{result.bestStack}</p>
         </div>
       </div>
+
+      {/* Disclaimer: demo data only */}
+      <p className="text-[10px] text-muted-foreground/70 mt-3 leading-relaxed">
+        比价为演示数据，仅供参考。
+      </p>
 
       <div className="flex justify-end mt-2">
         <button

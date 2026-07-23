@@ -109,7 +109,7 @@ export default function CalendarView({ slots, setSlots }: CalendarViewProps) {
 
   return (
     <div>
-      <div className="flex items-end justify-between mb-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
           <h2 className="text-3xl font-bold text-foreground leading-tight" style={{ fontFamily: "Playfair Display, serif" }}>
             约饭时间协调
@@ -118,7 +118,7 @@ export default function CalendarView({ slots, setSlots }: CalendarViewProps) {
             {weekRangeText} · 点击格子选择你有空的时间，颜色越深代表重叠人数越多 ✨
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Week navigator */}
           <div className="flex items-center rounded-xl border border-border overflow-hidden text-xs">
             <button type="button" onClick={goPrevWeek} className="px-2.5 py-1.5 text-muted-foreground hover:bg-secondary transition-colors" title="上一周">

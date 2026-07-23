@@ -13,15 +13,13 @@
 
 ## 📸 预览
 
-> ⚠️ 截图待补充：建议在 `docs/screenshots/` 目录放置以下截图
->
-> | 截图 | 内容 |
-> |------|------|
-> | `home.png` | 落地页 Hero 区域 |
-> | `dashboard.png` | 打卡列表与数据看板 |
-> | `calendar.png` | 多人约饭日历协调 |
-> | `deals.png` | 多平台比价面板 |
-> | `analytics.png` | 消费分析与统计图表 |
+![落地页](docs/screenshots/home.png)
+![打卡列表与数据看板](docs/screenshots/dashboard.png)
+![约饭日历协调](docs/screenshots/calendar.png)
+![多平台比价面板](docs/screenshots/deals.png)
+![消费分析](docs/screenshots/analytics.png)
+
+> 截图计划放置于 `docs/screenshots/`，图片待补充。
 
 ---
 
@@ -38,7 +36,7 @@
 | 👫 **好友邀请** | 生成邀请码分享给好友 | ✅ |
 | 📤 **数据导出** | CSV 导出，含中文 BOM，兼容 Excel/Numbers | ✅ |
 | ⚙️ **数据管理** | 备份、重置、编辑餐厅信息 | ✅ |
-| 🌐 **国际化** | 简体中文 / English 切换 | ✅ |
+| 🌐 **国际化** | 简体中文 / English 切换 | 📝 规划中 |
 
 ---
 
@@ -134,6 +132,35 @@ npm run preview      # 预览构建产物
 npm test             # 运行 vitest 单元测试
 npm run test:watch   # Watch 模式（开发时持续运行）
 ```
+
+---
+
+## 🚀 部署
+
+### 前端：GitHub Pages
+
+仓库名 `eato`，访问地址 <https://3404681919sl-cyber.github.io/eato/>。
+
+1. 推送 `main` 分支即触发 `.github/workflows/deploy.yml` 自动构建并发布。
+2. 仓库 **Settings → Pages → Source** 选择 **GitHub Actions**。
+3. Vite 已配置 `base: '/eato/'`，工作流在构建后复制 `dist/index.html` → `dist/404.html` 以支持 SPA 刷新（避免 404）。
+
+> 本地预览生产包：`npm run build && npm run preview`（预览服务器带 `/eato/` 基路径）。
+
+### 后端：Render（可选，仅 Mock 比价）
+
+比价服务可一键部署到 Render：
+
+1. 在 Render 新建 **Web Service**，连接本仓库，选择 **Docker** 运行时。
+2. 构建读取仓库 `server/` 下的 `Dockerfile` 与 `render.yaml`（`healthCheckPath: /api/health`）。
+3. 环境变量：如需高德 POI 搜索可填 `AMAP_KEY`（不填则前端直连高德，不影响比价）。
+4. 健康检查：`GET /api/health` 返回 `{ "status": "ok" }`。
+5. 部署后在前端设置环境变量 `VITE_API_BASE` 指向你的 Render 地址，比价即走后端；
+   **后端不可用时前端自动回退本地 Mock，绝不白屏。**
+
+### ⚠️ 比价数据免责声明
+
+> **比价为演示数据，仅供参考。** 当前比价结果由确定性种子算法在本地 / Mock 后端生成，并非真实平台实时报价，亦不构成任何消费建议。真实价格请以各平台官方页面为准。
 
 ---
 
@@ -253,7 +280,7 @@ npm test            # 单元测试（必须通过）
 - [x] 餐厅打卡 CRUD
 - [x] 数据可视化看板
 - [x] 多平台比价
-- [x] 国际化（中/英）
+- [ ] 国际化（中/英） 📝 规划中
 - [x] 好友邀请系统
 - [ ] **后端接入真实数据库**（当前为 Mock）
 - [ ] **用户认证系统**（JWT / OAuth）

@@ -1,37 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/eato/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eato · 和朋友一起的约饭打卡本</title>
+    <meta name="description" content="Eato 是一款和朋友一起用的约饭打卡本：收藏想去的餐厅、智能协调聚餐时间、分析消费数据，并一键比价美团/抖音/大众点评/淘宝闪购/闲鱼。" />
+    <meta name="theme-color" content="#BF4E2A" />
+    <meta name="robots" content="index, follow" />
 
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Dining and Travel Planner App</title>
-      <meta name="description" content="This app helps users plan dining experiences and travel itineraries by tracking visits, sharing schedules, and analyzing spending, enhancing group outings." />
-      <meta name="robots" content="noindex, nofollow" />
-      <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
-      
-    </head>
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Eato · 和朋友一起的约饭打卡本" />
+    <meta property="og:description" content="收藏餐厅、协调约饭时间、分析消费，并一键比价各大平台。" />
+    <meta property="og:image" content="https://3404681919sl-cyber.github.io/eato/og-image.png" />
+    <meta property="og:url" content="https://3404681919sl-cyber.github.io/eato/" />
 
-    <body>
-      
-      <div id="root"></div>
-      <div id="boot-error" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; padding:40px; background:#fff; color:#b91c1c; font:14px/1.6 monospace; white-space:pre-wrap; z-index:9999;"></div>
-      <script>
-        window.addEventListener('error', function(e) {
-          var box = document.getElementById('boot-error');
-          if (!box) return;
-          box.style.display = 'block';
-          box.textContent += 'ERROR: ' + e.message + '\n  at ' + (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '') + '\n\n';
-        });
-        window.addEventListener('unhandledrejection', function(e) {
-          var box = document.getElementById('boot-error');
-          if (!box) return;
-          box.style.display = 'block';
-          box.textContent += 'PROMISE REJECTION: ' + (e.reason && e.reason.stack ? e.reason.stack : String(e.reason)) + '\n\n';
-        });
-      </script>
-      <script type="module" src="/src/main.tsx"></script>
-      
-    </body>
-  </html>
-  
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Eato · 和朋友一起的约饭打卡本" />
+    <meta name="twitter:description" content="收藏餐厅、协调约饭时间、分析消费，并一键比价各大平台。" />
+    <meta name="twitter:image" content="https://3404681919sl-cyber.github.io/eato/og-image.png" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://3404681919sl-cyber.github.io/eato/" />
+
+    <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <div id="boot-error" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; padding:40px; background:#fff; color:#b91c1c; font:14px/1.6 monospace; white-space:pre-wrap; z-index:9999;"></div>
+    <script>
+      window.addEventListener('error', function(e) {
+        var box = document.getElementById('boot-error');
+        if (!box) return;
+        box.style.display = 'block';
+        box.textContent += 'ERROR: ' + e.message + '\n  at ' + (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '') + '\n\n';
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var box = document.getElementById('boot-error');
+        if (!box) return;
+        box.style.display = 'block';
+        box.textContent += 'PROMISE REJECTION: ' + (e.reason && e.reason.stack ? e.reason.stack : String(e.reason)) + '\n\n';
+      });
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
