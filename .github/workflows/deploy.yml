@@ -18,11 +18,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      # npm ci 在 Linux CI 上会触发 npm 可选依赖 bug(npm/cli#4828)，
-      # 漏装 @rollup/rollup-linux-x64-gnu 导致 Vite/vitest 启动即崩。
-      # 改用 npm install 以正确补齐当前平台的原生二进制。
-      - run: npm install
+      # Windows 生成的 package-lock.json 会把可选原生二进制锁成 win32 版本，
+      # 在 Linux CI 上触发 npm/cli#4828 漏装 @rollup/rollup-linux-x64-gnu，
+      # 导致 Vite/vitest 启动即崩。CI 中删除锁文件改用 npm install 重新解析，
+      # 让 npm 为 Linux runner 正确补齐平台原生二进制。
+      - run: rm -f package-lock.json && npm install
       - run: npm test
       - run: npm run build
       - run: cp dist/index.html dist/404.html
