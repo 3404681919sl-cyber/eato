@@ -19,7 +19,10 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      # npm ci 在 Linux CI 上会触发 npm 可选依赖 bug(npm/cli#4828)，
+      # 漏装 @rollup/rollup-linux-x64-gnu 导致 Vite/vitest 启动即崩。
+      # 改用 npm install 以正确补齐当前平台的原生二进制。
+      - run: npm install
       - run: npm test
       - run: npm run build
       - run: cp dist/index.html dist/404.html
