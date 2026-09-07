@@ -27,6 +27,7 @@ export const BRAND = {
 export const STORAGE_KEYS = {
   PLACES: "eato_places",
   SLOTS: "eato_slots",
+  MEAL_EVENTS: "eato_meal_events_v1",
 } as const;
 
 // ── API ──

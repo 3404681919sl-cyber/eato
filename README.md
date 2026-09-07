@@ -147,6 +147,20 @@ npm run test:watch   # Watch 模式（开发时持续运行）
 
 > 本地预览生产包：`npm run build && npm run preview`（预览服务器带 `/eato/` 基路径）。
 
+### 前端：Vercel（推荐的预览/测试环境）
+
+项目根目录已提供 `vercel.json`，会以根路径构建并将 SPA 深链接（如 `/app`、`/auth`）回退到 `index.html`。
+
+1. 将当前功能分支推送到 GitHub 后，在 Vercel 选择 **Add New → Project** 并导入 `3404681919sl-cyber/eato`。
+2. 根目录保持仓库根目录；Vercel 会读取 `vercel.json` 并使用 `DEPLOY_BASE=/ npm run build`、`dist`。
+3. 在 **Settings → Environment Variables** 中为 Preview 和 Production 填入：
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`
+   - 可选的 `VITE_AMAP_KEY`
+4. 先创建 Preview 部署，确认邀请链接、`/app` 刷新和 Supabase 匿名登录可用后，再提升为 Production。
+
+> 这些 `VITE_*` 值会打包进浏览器端；这里只能放 Supabase URL、Publishable Key 等公开客户端配置，不能放 service-role 或数据库密码。
+
 ### 生产环境：EdgeOne Pages（国内可达主站）
 
 主生产站点部署在腾讯云 EdgeOne Pages，国内直连可达，不依赖 GitHub Pages：
