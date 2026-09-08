@@ -56,7 +56,7 @@ export default function MealCollectionPanel({ event, onSave, currentUserId }: Me
   };
   const addCandidate = () => {
     apply(addManualCandidate(event, {
-      id: `manual-${Date.now()}`,
+      id: crypto.randomUUID(),
       name: candidateName,
       cuisineTags: candidateTags.split(","),
       ...(candidatePrice ? { pricePerPerson: Number(candidatePrice) } : {}),
@@ -109,6 +109,44 @@ export default function MealCollectionPanel({ event, onSave, currentUserId }: Me
         </div>
       </section>
 
+      {/* §3: 候选方案 — 所有成员可见，成员之间共享候选列表 */}
+      {event.candidates.length > 0 && (
+        <section className="rounded-2xl border border-border p-4 sm:p-5">
+          <h2 className="text-base font-semibold text-foreground">候选方案</h2>
+          <ul className="mt-3 space-y-1.5 text-sm text-foreground">
+            {event.candidates.map((candidate) => (
+              <li key={candidate.id} className="flex flex-wrap items-center gap-2">
+                <span className="font-medium">{candidate.name}</span>
+                {candidate.cuisineTags.length > 0 && <span className="text-xs text-muted-foreground">（{candidate.cuisineTags.join("、")}）</span>}
+                {candidate.pricePerPerson != null && <span className="text-xs text-muted-foreground">¥{candidate.pricePerPerson}/人</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* §4: 成员进度 — 所有成员可见（不含邮箱 / auth uid 等敏感信息） */}
+      <section className="rounded-2xl border border-border p-4 sm:p-5">
+        <h2 className="text-base font-semibold text-foreground">成员进度</h2>
+        <ul className="mt-3 divide-y divide-border">
+          {event.participants.map((participant) => {
+            const hasAvailability = event.availabilities.some((slot) => slot.participantId === participant.id);
+            const preference = event.preferences[participant.id];
+            const hasPreference = Boolean(preference && (preference.likedCuisines.length > 0 || preference.dislikedCuisines.length > 0 || preference.taboos.length > 0 || preference.budget));
+            return (
+              <li key={participant.id} className="py-2 text-sm">
+                <span className="font-medium text-foreground">{participant.displayName}</span>
+                {participant.role === "creator" && <span className="ml-1 text-xs text-muted-foreground">（创建者）</span>}
+                <span className="ml-2 text-muted-foreground">{hasAvailability ? "已填时间" : "未填时间"} · {hasPreference ? "已填偏好" : "未填偏好"}</span>
+                {preference && preference.likedCuisines.length > 0 && <span className="ml-2 text-xs text-muted-foreground">喜欢：{preference.likedCuisines.join("、")}</span>}
+                {preference && preference.taboos.length > 0 && <span className="ml-2 text-xs text-muted-foreground">忌口：{preference.taboos.join("、")}</span>}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* §3 + §6: 人工候选添加与生成方案 — 仅创建者可操作，成员只能查看上方候选列表 */}
       {canManageMeal && <section className="rounded-2xl border border-border p-4 sm:p-5">
         <h2 className="text-base font-semibold text-foreground">人工候选</h2>
         <p className="mt-1 text-xs text-muted-foreground">当前不接入外部餐厅或优惠数据，请手动填写候选。</p>
@@ -120,7 +158,6 @@ export default function MealCollectionPanel({ event, onSave, currentUserId }: Me
         <button type="button" onClick={addCandidate} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-primary/40 px-4 text-sm font-semibold text-primary hover:bg-primary/5">
           <Plus className="h-4 w-4" aria-hidden="true" />添加人工候选
         </button>
-        {event.candidates.length > 0 && <p className="mt-3 text-sm text-muted-foreground">已添加：{event.candidates.map((candidate) => candidate.name).join("、")}</p>}
       </section>}
 
       {canManageMeal && <button type="button" onClick={() => apply(beginDecision(event))} className="inline-flex min-h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground hover:opacity-90">
