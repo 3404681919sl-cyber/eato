@@ -88,4 +88,39 @@ describe("MealCollectionPanel", () => {
       candidates: [expect.objectContaining({ name: "川味火锅", cuisineTags: ["火锅"] })],
     }));
   });
+
+  it("shows candidates and member progress to a non-creator cloud member without management controls", () => {
+    const onSave = vi.fn();
+    const event = createEvent({
+      candidates: [{ id: "c-1", eventId: "event-1", name: "火锅店", kind: "restaurant", cuisineTags: ["火锅"], offers: [] }],
+      availabilities: [{ participantId: "shuai", date: "2026-08-29", mealPeriod: "lunch" }],
+      preferences: {
+        mei: { likedCuisines: ["粤菜"], dislikedCuisines: [], taboos: [], budget: { min: 80, max: 150 }, isFlexible: true },
+        shuai: { likedCuisines: ["火锅"], dislikedCuisines: [], taboos: ["香菜"], budget: { min: 80, max: 150 }, isFlexible: true },
+        hao: { likedCuisines: [], dislikedCuisines: [], taboos: [], budget: { min: 80, max: 150 }, isFlexible: true },
+      },
+    });
+    render(<MealCollectionPanel event={event} onSave={onSave} currentUserId="shuai" />);
+
+    expect(screen.getByText("候选方案")).toBeInTheDocument();
+    expect(screen.getByText("火锅店")).toBeInTheDocument();
+    expect(screen.getByText("成员进度")).toBeInTheDocument();
+    expect(screen.getByText("小美")).toBeInTheDocument();
+
+    expect(screen.queryByRole("button", { name: "添加人工候选" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "生成规则方案" })).not.toBeInTheDocument();
+  });
+
+  it("assigns a cloud UUID to manually added candidates so cloud save succeeds", () => {
+    const onSave = vi.fn();
+    render(<MealCollectionPanel event={createEvent()} onSave={onSave} currentUserId="mei" />);
+
+    fireEvent.change(screen.getByLabelText("候选名称"), { target: { value: "川味火锅" } });
+    fireEvent.change(screen.getByLabelText(/菜系标签/), { target: { value: "火锅" } });
+    fireEvent.click(screen.getByRole("button", { name: "添加人工候选" }));
+
+    const saved = onSave.mock.calls[0][0];
+    const candidate = saved.candidates[saved.candidates.length - 1];
+    expect(candidate.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+  });
 });
