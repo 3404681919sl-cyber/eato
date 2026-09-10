@@ -13,9 +13,16 @@ type DecisionOptionsPanelProps = {
 
 const VOTES: Array<{ value: VoteValue; label: string; icon: typeof ThumbsUp }> = [
   { value: "support", label: "支持", icon: ThumbsUp },
-  { value: "neutral", label: "中立", icon: Check },
+  { value: "neutral", label: "还行", icon: Check },
   { value: "veto", label: "否决", icon: ThumbsDown },
 ];
+
+type ChipTone = "good" | "warn" | "bad";
+const CHIP_CLASS: Record<ChipTone, string> = {
+  good: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  warn: "bg-amber-50 text-amber-700 border-amber-200",
+  bad: "bg-red-50 text-red-700 border-red-200",
+};
 
 export default function DecisionOptionsPanel({ event, onSave, currentUserId }: DecisionOptionsPanelProps) {
   const initialParticipantId = currentUserId && event.participantIds.includes(currentUserId) ? currentUserId : event.creatorId;
@@ -46,17 +53,42 @@ export default function DecisionOptionsPanel({ event, onSave, currentUserId }: D
         {options.map((option, index) => {
           const candidate = event.candidates.find((item) => item.id === option.candidateId);
           const vetoed = event.votes.some((vote) => vote.candidateId === option.candidateId && vote.value === "veto");
+          const timeScore = option.scoreBreakdown.time;
+          const budgetScore = option.scoreBreakdown.budget;
+          const cuisineScore = Number.isFinite(option.scoreBreakdown.cuisine) ? option.scoreBreakdown.cuisine : 50;
+          // A real cuisine signal exists only when at least one participant has
+          // actually entered liked/disliked cuisines. Without it, the engine's
+          // score is a neutral 50 — surface "口味待补充" instead of a false match.
+          const hasCuisineSignal = event.participantIds.some((id) => {
+            const profile = event.preferences[id];
+            return Boolean(profile && (profile.likedCuisines.length > 0 || profile.dislikedCuisines.length > 0));
+          });
+          const cuisineChip: { label: string; tone: ChipTone } = hasCuisineSignal
+            ? (cuisineScore >= 60 ? { label: "口味匹配", tone: "good" } : cuisineScore < 40 ? { label: "口味分歧", tone: "bad" } : { label: "口味中性", tone: "warn" })
+            : { label: "口味待补充", tone: "warn" };
+          const chips: { label: string; tone: ChipTone }[] = [
+            timeScore >= 100 ? { label: "时间匹配", tone: "good" as const } : timeScore > 0 ? { label: "时间部分匹配", tone: "warn" as const } : { label: "时间冲突", tone: "bad" as const },
+            budgetScore >= 100 ? { label: "预算匹配", tone: "good" as const } : budgetScore === 0 ? { label: "超预算", tone: "bad" as const } : { label: "预算待定", tone: "warn" as const },
+            cuisineChip,
+          ];
           return <article key={`${option.candidateId}-${option.date}-${option.mealPeriod}`} className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
             <div className="flex items-start justify-between gap-3">
-              <div><p className="text-xs font-semibold text-primary">方案 {index + 1} · {option.totalScore} 分</p><h3 className="mt-1 text-lg font-semibold text-foreground">{candidate?.name ?? option.candidateId}</h3><p className="mt-1 text-sm text-muted-foreground">{option.date} · {periodLabel(option.mealPeriod)}</p></div>
-              <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${option.readyToConfirm && !vetoed ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{option.readyToConfirm && !vetoed ? "可确认" : "待协调"}</span>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-primary">方案 {index + 1} · {option.totalScore} 分</p>
+                <h3 className="mt-1 text-lg font-semibold text-foreground">{candidate?.name ?? option.candidateId}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{option.date} · {periodLabel(option.mealPeriod)}</p>
+              </div>
+              <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${option.readyToConfirm && !vetoed ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{option.readyToConfirm && !vetoed ? "可确认" : "待协调"}</span>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {chips.map((chip) => <span key={chip.label} className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${CHIP_CLASS[chip.tone]}`}>{chip.label}</span>)}
             </div>
             <ul className="mt-3 space-y-1 text-sm text-foreground">{option.reasons.map((reason) => <li key={reason}>· {reason}</li>)}</ul>
             {option.conflicts.length > 0 && <ul className="mt-3 space-y-1 rounded-xl bg-secondary/60 p-3 text-xs text-muted-foreground">{option.conflicts.map((conflict) => <li key={conflict}>· {conflict}</li>)}</ul>}
             {vetoed && <p className="mt-3 text-sm text-destructive">已有成员否决，不能确认。</p>}
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap items-center gap-2">
               {VOTES.map((vote) => { const Icon = vote.icon; return <button key={vote.value} type="button" aria-label={`${vote.label} ${candidate?.name ?? option.candidateId}`} onClick={() => apply(castVote(event, { participantId, candidateId: option.candidateId, value: vote.value }))} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-border px-3 text-sm text-foreground hover:bg-secondary"><Icon className="h-4 w-4" aria-hidden="true" />{vote.label}</button>; })}
-              {canConfirm && <button type="button" aria-label={`确认 ${candidate?.name ?? option.candidateId}`} disabled={!option.readyToConfirm || vetoed} onClick={() => apply(confirmDecision(event, option))} className="min-h-11 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-45">确认</button>}
+              {canConfirm && <button type="button" aria-label="确认这个方案" disabled={!option.readyToConfirm || vetoed} onClick={() => apply(confirmDecision(event, option))} className="ml-auto min-h-11 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-45">确认这个方案</button>}
             </div>
           </article>;
         })}

@@ -132,12 +132,14 @@ export default function MealCollectionPanel({ event, onSave, currentUserId }: Me
           {event.participants.map((participant) => {
             const hasAvailability = event.availabilities.some((slot) => slot.participantId === participant.id);
             const preference = event.preferences[participant.id];
-            const hasPreference = Boolean(preference && (preference.likedCuisines.length > 0 || preference.dislikedCuisines.length > 0 || preference.taboos.length > 0 || preference.budget));
+            // "已提供口味" counts only real cuisine input (liked/disliked/taboos).
+            // A default budget does NOT count as a filled preference.
+            const hasCuisine = Boolean(preference && (preference.likedCuisines.length > 0 || preference.dislikedCuisines.length > 0 || preference.taboos.length > 0));
             return (
               <li key={participant.id} className="py-2 text-sm">
                 <span className="font-medium text-foreground">{participant.displayName}</span>
                 {participant.role === "creator" && <span className="ml-1 text-xs text-muted-foreground">（创建者）</span>}
-                <span className="ml-2 text-muted-foreground">{hasAvailability ? "已填时间" : "未填时间"} · {hasPreference ? "已填偏好" : "未填偏好"}</span>
+                <span className="ml-2 text-muted-foreground">{hasAvailability ? "✓ 已选时间" : "○ 未选时间"} · {hasCuisine ? "✓ 已提供口味" : "○ 未提供口味"}</span>
                 {preference && preference.likedCuisines.length > 0 && <span className="ml-2 text-xs text-muted-foreground">喜欢：{preference.likedCuisines.join("、")}</span>}
                 {preference && preference.taboos.length > 0 && <span className="ml-2 text-xs text-muted-foreground">忌口：{preference.taboos.join("、")}</span>}
               </li>
@@ -160,7 +162,7 @@ export default function MealCollectionPanel({ event, onSave, currentUserId }: Me
         </button>
       </section>}
 
-      {canManageMeal && <button type="button" onClick={() => apply(beginDecision(event))} className="inline-flex min-h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground hover:opacity-90">
+      {canManageMeal && event.status === "collecting" && <button type="button" onClick={() => apply(beginDecision(event))} className="inline-flex min-h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground hover:opacity-90">
         生成规则方案
       </button>}
     </div>

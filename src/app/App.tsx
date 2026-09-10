@@ -1,13 +1,12 @@
-import React, { Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 import { Routes, Route, useNavigate } from "react-router";
 
-import type { AuthMode } from "@/types";
 import { DataProvider } from "@/services/DataProvider";
+import { DeveloperModeProvider } from "@/services/developerMode";
 
 // Code-split the top-level routes so the initial bundle only ships what the
 // landing page needs; the rest is fetched on demand.
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
-const AuthPage = lazy(() => import("@/pages/AuthPage"));
 const AppShell = lazy(() => import("@/app/AppShell"));
 
 function PageLoader() {
@@ -23,30 +22,19 @@ function PageLoader() {
 
 // ─── App Entry ────────────────────────────────────────────────────────────────
 
-function AuthPageWrapper() {
-  const [authMode, setAuthMode] = React.useState<AuthMode>("login");
-  const navigate = useNavigate();
-  return (
-    <AuthPage
-      mode={authMode}
-      onModeChange={setAuthMode}
-      onLogin={() => navigate("/app")}
-    />
-  );
-}
-
 export default function App() {
   const navigate = useNavigate();
 
   return (
-    <DataProvider>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<LandingPage onStart={() => navigate("/auth")} />} />
-          <Route path="/auth" element={<AuthPageWrapper />} />
-          <Route path="/app" element={<AppShell />} />
-        </Routes>
-      </Suspense>
-    </DataProvider>
+    <DeveloperModeProvider>
+      <DataProvider>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<LandingPage onStart={() => navigate("/app")} />} />
+            <Route path="/app" element={<AppShell />} />
+          </Routes>
+        </Suspense>
+      </DataProvider>
+    </DeveloperModeProvider>
   );
 }

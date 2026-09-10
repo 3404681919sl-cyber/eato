@@ -18,6 +18,7 @@ type CreateMealEventViewProps = {
   onCreated?: (event: MealEvent) => void;
   mode?: "local" | "cloud";
   cloudCreatorId?: string;
+  developerMode?: boolean;
 };
 
 function getDateAfter(days: number): string {
@@ -46,6 +47,7 @@ export default function CreateMealEventView({
   onCreated,
   mode = "local",
   cloudCreatorId,
+  developerMode = false,
 }: CreateMealEventViewProps) {
   const [input, setInput] = useState<CreateMealEventInput>(createInitialInput);
   const [issues, setIssues] = useState<DomainIssue[]>([]);
@@ -134,15 +136,15 @@ export default function CreateMealEventView({
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
           <Users className="w-3.5 h-3.5" aria-hidden="true" />
-          {isCloudMode ? "云端协作" : "单设备模拟协作"}
+          {developerMode ? (isCloudMode ? "云端协作" : "本设备练习") : (isCloudMode ? "邀请朋友一起填写" : "先自己试试")}
         </div>
         <h2 className="mt-3 text-3xl font-bold text-foreground" style={{ fontFamily: "Playfair Display, serif" }}>
           发起一顿饭
         </h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           {isCloudMode
-            ? "创建后会保存到云端。当前先创建你本人，后续可邀请成员。"
-            : "先建一个饭局，再代入每位朋友填写时间与偏好。现在只会保存到本设备，不会发送邀请。"}
+            ? (developerMode ? "创建后会保存到云端。当前先创建你本人，后续可邀请成员。" : "创建后即可邀请朋友。后续把链接发给朋友，他们填时间和口味。")
+            : (developerMode ? "先在设备上本地练习：添加朋友、填写时间和偏好。这是本地模拟，不接入云端，无法真正邀请朋友。" : "先在设备上练习：添加朋友、填写时间和偏好。")}
         </p>
       </div>
 
@@ -236,8 +238,9 @@ export default function CreateMealEventView({
           </div>
         </fieldset>
 
+        {!isCloudMode && (
         <fieldset className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <legend className="px-2 text-sm font-semibold text-foreground">模拟成员（3–8 人）</legend>
+          <legend className="px-2 text-sm font-semibold text-foreground">饭局成员（3–8 人）</legend>
           <p className="mt-2 text-xs leading-5 text-muted-foreground">发起人可先代填，后续再为每位成员收集时间和饮食偏好。</p>
           <div className="mt-4 space-y-3">
             {input.participants.map((participant, index) => {
@@ -285,6 +288,7 @@ export default function CreateMealEventView({
             添加成员
           </button>
         </fieldset>
+        )}
 
         {submitStatus === "error" && (
           <p className="rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">
@@ -293,7 +297,7 @@ export default function CreateMealEventView({
         )}
         {submitStatus === "success" && (
           <p className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground" role="status">
-            饭局已保存到本设备。下一步可继续收集大家的时间和偏好。
+            {isCloudMode ? "饭局已创建，邀请朋友加入吧！" : "饭局已创建（本地练习）。"}
           </p>
         )}
 
@@ -303,7 +307,7 @@ export default function CreateMealEventView({
           className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
         >
           <CalendarDays className="w-4 h-4" aria-hidden="true" />
-          {submitStatus === "saving" ? "创建中…" : "创建并开始收集"}
+          {submitStatus === "saving" ? "创建中…" : (isCloudMode ? "创建并邀请朋友" : "创建饭局")}
         </button>
       </form>
     </section>

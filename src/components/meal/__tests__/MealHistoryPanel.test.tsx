@@ -42,11 +42,26 @@ describe("MealHistoryPanel", () => {
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ status: "collecting" }));
   });
 
-  it("shows a confirmed meal to a cloud member without management controls", () => {
+  it("shows only the result card to a non-creator member on a confirmed meal", () => {
+    // creatorId === "mei"; a plain member must never see the management section.
     render(<MealHistoryPanel event={createConfirmedEvent()} onSave={vi.fn()} currentUserId="shuai" />);
 
-    expect(screen.getByRole("heading", { name: "饭局已确认" })).toBeInTheDocument();
+    expect(screen.getByText("就这么定了")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "饭局已确认" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "重新协调" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "记录饭后结果" })).not.toBeInTheDocument();
+  });
+
+  it("hides the upcoming-feature placeholders for normal users but shows them in developer mode", () => {
+    const onSave = vi.fn();
+    const { rerender } = render(<MealHistoryPanel event={createConfirmedEvent()} onSave={onSave} />);
+
+    expect(screen.queryByText("地图（即将上线）")).not.toBeInTheDocument();
+
+    rerender(<MealHistoryPanel event={createConfirmedEvent()} onSave={onSave} developerMode />);
+
+    expect(screen.getByText("地图（即将上线）")).toBeInTheDocument();
+    expect(screen.getByText("在线预订（即将上线）")).toBeInTheDocument();
+    expect(screen.getByText("优惠比价（即将上线）")).toBeInTheDocument();
   });
 });

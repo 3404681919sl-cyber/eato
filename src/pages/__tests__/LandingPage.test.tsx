@@ -5,44 +5,32 @@ import LandingPage from "../LandingPage";
 describe("LandingPage", () => {
   it("should render the app name", () => {
     render(<LandingPage onStart={vi.fn()} />);
-    const headings = screen.getAllByText("Eato");
-    expect(headings.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Eato").length).toBeGreaterThan(0);
   });
 
-  it("should render the tagline", () => {
+  it("should render the decision-assistant hero copy", () => {
     render(<LandingPage onStart={vi.fn()} />);
-    expect(screen.getByText("和朋友一起发现、打卡、记录")).toBeDefined();
+    expect(screen.getByText(/Eato 帮你们汇总成共同方案/)).toBeDefined();
+    expect(screen.getByText("多人约饭决策助手")).toBeDefined();
   });
 
-  it("should render feature cards", () => {
+  it("should render the three capability cards", () => {
     render(<LandingPage onStart={vi.fn()} />);
-    expect(screen.getByText("智能打卡表")).toBeDefined();
-    expect(screen.getByText("约饭时间协调")).toBeDefined();
-    expect(screen.getByText("美食数据洞察")).toBeDefined();
+    ["大家各填自己的", "自动找到共同时间", "一起选出最终方案"].forEach((title) => {
+      expect(screen.getAllByText(title).length).toBeGreaterThan(0);
+    });
   });
 
-  it("should call onStart when '开始约饭' is clicked", () => {
+  it("should call onStart when '发起一次约饭' is clicked", () => {
     const onStart = vi.fn();
     render(<LandingPage onStart={onStart} />);
-    fireEvent.click(screen.getByText("开始约饭"));
+    const buttons = screen.getAllByRole("button", { name: "发起一次约饭" });
+    expect(buttons.length).toBeGreaterThan(0);
+    fireEvent.click(buttons[0]);
     expect(onStart).toHaveBeenCalledTimes(1);
   });
 
-  it("should call onStart when '登录 / 注册' is clicked", () => {
-    const onStart = vi.fn();
-    render(<LandingPage onStart={onStart} />);
-    fireEvent.click(screen.getByText("登录 / 注册"));
-    expect(onStart).toHaveBeenCalledTimes(1);
-  });
-
-  it("should call onStart when '免费注册' is clicked", () => {
-    const onStart = vi.fn();
-    render(<LandingPage onStart={onStart} />);
-    fireEvent.click(screen.getByText("免费注册"));
-    expect(onStart).toHaveBeenCalledTimes(1);
-  });
-
-  it("should render copyright footer", () => {
+  it("should render the copyright footer", () => {
     render(<LandingPage onStart={vi.fn()} />);
     expect(screen.getByText(/© 2026 Eato/)).toBeDefined();
   });

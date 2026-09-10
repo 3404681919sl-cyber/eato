@@ -16,7 +16,7 @@ describe("CreateMealEventView", () => {
 
     const title = screen.getByLabelText("饭局名称");
     fireEvent.blur(title);
-    fireEvent.click(screen.getByRole("button", { name: "创建并开始收集" }));
+    fireEvent.click(screen.getByRole("button", { name: "创建饭局" }));
 
     expect(screen.getByText("请填写饭局名称")).toBeInTheDocument();
     await expect(repository.list()).resolves.toEqual([]);
@@ -27,13 +27,13 @@ describe("CreateMealEventView", () => {
     render(<CreateMealEventView repository={repository} />);
 
     fireEvent.change(screen.getByLabelText("饭局名称"), { target: { value: "周五火锅局" } });
-    fireEvent.click(screen.getByRole("button", { name: "创建并开始收集" }));
+    fireEvent.click(screen.getByRole("button", { name: "创建饭局" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent("饭局已保存到本设备");
+    expect(await screen.findByRole("status")).toHaveTextContent("饭局已创建（本地练习）。");
     const events = await repository.list();
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({ title: "周五火锅局", status: "collecting" });
-    expect(screen.getByRole("button", { name: "创建并开始收集" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "创建饭局" })).toBeDisabled();
   });
 
   it("notifies the workspace after it has persisted a new meal", async () => {
@@ -41,7 +41,7 @@ describe("CreateMealEventView", () => {
     render(<CreateMealEventView repository={new LocalMealEventRepository()} onCreated={onCreated} />);
 
     fireEvent.change(screen.getByLabelText("饭局名称"), { target: { value: "周五火锅局" } });
-    fireEvent.click(screen.getByRole("button", { name: "创建并开始收集" }));
+    fireEvent.click(screen.getByRole("button", { name: "创建饭局" }));
 
     await waitFor(() => expect(onCreated).toHaveBeenCalledWith(expect.objectContaining({ title: "周五火锅局", status: "collecting" })));
   });
@@ -54,10 +54,10 @@ describe("CreateMealEventView", () => {
       cloudCreatorId="00000000-0000-4000-8000-000000000001"
     />);
 
-    expect(screen.getByText("云端协作")).toBeInTheDocument();
-    expect(screen.getByText("创建后会保存到云端。当前先创建你本人，后续可邀请成员。")).toBeInTheDocument();
+    expect(screen.getByText("邀请朋友一起填写")).toBeInTheDocument();
+    expect(screen.getByText("创建后即可邀请朋友。后续把链接发给朋友，他们填时间和口味。")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("饭局名称"), { target: { value: "云端周五火锅局" } });
-    fireEvent.click(screen.getByRole("button", { name: "创建并开始收集" }));
+    fireEvent.click(screen.getByRole("button", { name: "创建并邀请朋友" }));
 
     await screen.findByRole("status");
     const [event] = await repository.list();
@@ -77,7 +77,7 @@ describe("CreateMealEventView", () => {
 
     const title = screen.getByLabelText("饭局名称");
     fireEvent.change(title, { target: { value: "保留草稿" } });
-    fireEvent.click(screen.getByRole("button", { name: "创建并开始收集" }));
+    fireEvent.click(screen.getByRole("button", { name: "创建饭局" }));
 
     expect(await screen.findByText("本地保存失败，请稍后重试")).toBeInTheDocument();
     expect(title).toHaveValue("保留草稿");
@@ -99,7 +99,7 @@ describe("CreateMealEventView", () => {
 
     const title = screen.getByLabelText("饭局名称");
     fireEvent.change(title, { target: { value: "云端保留草稿" } });
-    fireEvent.click(screen.getByRole("button", { name: "创建并开始收集" }));
+    fireEvent.click(screen.getByRole("button", { name: "创建并邀请朋友" }));
 
     expect(await screen.findByText("云端保存失败，请稍后重试")).toBeInTheDocument();
     expect(title).toHaveValue("云端保留草稿");

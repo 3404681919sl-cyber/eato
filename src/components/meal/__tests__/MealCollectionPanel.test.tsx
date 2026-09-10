@@ -123,4 +123,22 @@ describe("MealCollectionPanel", () => {
     const candidate = saved.candidates[saved.candidates.length - 1];
     expect(candidate.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
   });
+
+  it("treats a default budget alone as not having provided cuisine preferences", () => {
+    const onSave = vi.fn();
+    const event = createEvent({
+      availabilities: [{ participantId: "mei", date: "2026-08-29", mealPeriod: "lunch" }],
+      preferences: {
+        mei: { likedCuisines: [], dislikedCuisines: [], taboos: [], budget: { min: 80, max: 150 }, isFlexible: true },
+        shuai: { likedCuisines: [], dislikedCuisines: [], taboos: [], budget: { min: 80, max: 150 }, isFlexible: true },
+        hao: { likedCuisines: [], dislikedCuisines: [], taboos: [], budget: { min: 80, max: 150 }, isFlexible: true },
+      },
+    });
+    render(<MealCollectionPanel event={event} onSave={onSave} currentUserId="shuai" />);
+
+    // mei provided a time slot (with only a default budget) → shows 已选时间 but NOT 已提供口味.
+    expect(screen.getAllByText("✓ 已选时间", { exact: false }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("○ 未提供口味", { exact: false }).length).toBeGreaterThan(0);
+    expect(screen.queryByText("✓ 已提供口味", { exact: false })).not.toBeInTheDocument();
+  });
 });

@@ -43,7 +43,7 @@ describe("DecisionOptionsPanel", () => {
     const onSave = vi.fn();
     render(<DecisionOptionsPanel event={createEvent()} onSave={onSave} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "确认 川味火锅" }));
+    fireEvent.click(screen.getByRole("button", { name: "确认这个方案" }));
 
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
       status: "confirmed", decision: expect.objectContaining({ candidateId: "hotpot" }),
@@ -60,6 +60,22 @@ describe("DecisionOptionsPanel", () => {
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
       votes: [{ participantId: "shuai", candidateId: "hotpot", value: "support" }],
     }));
-    expect(screen.queryByRole("button", { name: "确认 川味火锅" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "确认这个方案" })).not.toBeInTheDocument();
+  });
+
+  it("shows 口味待补充 when no participant has entered any cuisine preference", () => {
+    const onSave = vi.fn();
+    const event = createEvent({
+      preferences: {
+        mei: { likedCuisines: [], dislikedCuisines: [], taboos: [], budget: { min: 80, max: 150 }, isFlexible: true },
+        shuai: { likedCuisines: [], dislikedCuisines: [], taboos: [], budget: { min: 80, max: 150 }, isFlexible: true },
+        hao: { likedCuisines: [], dislikedCuisines: [], taboos: [], budget: { min: 80, max: 150 }, isFlexible: true },
+      },
+    });
+    render(<DecisionOptionsPanel event={event} onSave={onSave} />);
+
+    expect(screen.getByText("口味待补充")).toBeInTheDocument();
+    expect(screen.queryByText("口味匹配")).not.toBeInTheDocument();
+    expect(screen.queryByText("口味分歧")).not.toBeInTheDocument();
   });
 });

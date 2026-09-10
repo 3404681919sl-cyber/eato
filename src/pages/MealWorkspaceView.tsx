@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import { Plus, Users } from "lucide-react";
+import { Users } from "lucide-react";
 
-import type { MealEvent } from "@/domain/meal";
+import type { MealEvent, MealStatus } from "@/domain/meal";
 import type { MealEventRepository } from "@/services/mealEventRepository";
 import type { MealRealtimeSync } from "@/services/mealRealtimeSync";
-import MealEventList from "@/components/meal/MealEventList";
+import { rankMealOptions } from "@/domain/decisionEngine";
 import MealCollectionPanel from "@/components/meal/MealCollectionPanel";
 import DecisionOptionsPanel from "@/components/meal/DecisionOptionsPanel";
 import MealHistoryPanel from "@/components/meal/MealHistoryPanel";
 import MealInvitePanel from "@/components/meal/MealInvitePanel";
+import MealConsensus from "@/components/meal/MealConsensus";
 
 type MealWorkspaceViewProps = {
   repository: MealEventRepository;
@@ -17,13 +18,23 @@ type MealWorkspaceViewProps = {
   initialEventId?: string;
   onCreate?: () => void;
   cloudUserId?: string;
+  developerMode?: boolean;
   inviteRepository?: {
     createShareUrl(eventId: string, appUrl: string): Promise<string>;
   };
   inviteAppUrl?: string;
 };
 
-export default function MealWorkspaceView({ repository, realtimeSync, mode = "local", initialEventId, onCreate, cloudUserId, inviteRepository, inviteAppUrl }: MealWorkspaceViewProps) {
+const STEP_LABELS = ["收集信息", "共同决定", "已确认"];
+
+function currentStepIndex(status: MealStatus): number {
+  if (status === "collecting") return 0;
+  if (status === "deciding") return 1;
+  if (status === "confirmed" || status === "completed") return 2;
+  return 0;
+}
+
+export default function MealWorkspaceView({ repository, realtimeSync, mode = "local", initialEventId, onCreate, cloudUserId, developerMode = false, inviteRepository, inviteAppUrl }: MealWorkspaceViewProps) {
   const [events, setEvents] = useState<MealEvent[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
@@ -96,7 +107,7 @@ export default function MealWorkspaceView({ repository, realtimeSync, mode = "lo
   };
 
   if (isLoading) {
-    return <p className="py-14 text-center text-sm text-muted-foreground" role="status">正在加载本地饭局…</p>;
+    return <p className="py-14 text-center text-sm text-muted-foreground" role="status">正在加载饭局…</p>;
   }
 
   if (loadError) {
@@ -108,10 +119,9 @@ export default function MealWorkspaceView({ repository, realtimeSync, mode = "lo
       <section className="mx-auto max-w-2xl rounded-2xl border border-border bg-card px-6 py-14 text-center shadow-sm">
         <Users className="mx-auto h-9 w-9 text-muted-foreground/45" aria-hidden="true" />
         <h2 className="mt-4 text-2xl font-bold text-foreground" style={{ fontFamily: "Playfair Display, serif" }}>还没有饭局</h2>
-        <p className="mt-2 text-sm text-muted-foreground">先发起一场饭局，再在本设备里代填朋友们的时间和偏好。</p>
+        <p className="mt-2 text-sm text-muted-foreground">先发起一场饭局，再邀请朋友一起填时间和偏好。</p>
         {onCreate && (
           <button type="button" onClick={onCreate} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
-            <Plus className="h-4 w-4" aria-hidden="true" />
             发起第一场饭局
           </button>
         )}
@@ -119,36 +129,109 @@ export default function MealWorkspaceView({ repository, realtimeSync, mode = "lo
     );
   }
 
+  const event = selectedEvent;
+  const isPreConfirmed = event.status === "collecting" || event.status === "deciding";
+  const isCreator = cloudUserId ? event.creatorId === cloudUserId : true;
+  const total = event.participants.length;
+  const meta = [
+    `${total} 人`,
+    `人均 ¥${event.budget.min}–${event.budget.max}`,
+    event.city ? event.city : "",
+    event.area ? event.area : "",
+  ].filter(Boolean).join(" · ");
+  const stepIndex = currentStepIndex(event.status);
+
   return (
-    <section className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
-      <MealEventList events={events} selectedId={selectedEvent.id} onSelect={setSelectedId} />
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-        <p className="text-xs font-semibold text-primary">{mode === "cloud" ? "云端协作" : "仅本设备模拟"}</p>
-        <h1 className="mt-1 text-3xl font-bold text-foreground" style={{ fontFamily: "Playfair Display, serif" }}>{selectedEvent.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">当前状态：{statusLabel(selectedEvent.status)}。{mode === "cloud" ? "内容从云端读取，变更会自动同步。" : "成员资料仅在本设备中代填。"}</p>
-        {isRealtimeRefreshing && <p className="mt-3 text-sm text-muted-foreground" role="status" aria-label="正在同步云端饭局">正在同步云端饭局…</p>}
-        {realtimeError && <p className="mt-4 rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">{realtimeError}</p>}
-        {saveError && <p className="mt-4 rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">{saveError}</p>}
-        {mode === "cloud" && cloudUserId && inviteRepository && inviteAppUrl && (
-          <MealInvitePanel
-            eventId={selectedEvent.id}
-            isCreator={selectedEvent.creatorId === cloudUserId}
-            repository={inviteRepository}
-            appUrl={inviteAppUrl}
-          />
-        )}
-        {(selectedEvent.status === "collecting" || selectedEvent.status === "deciding") && <MealCollectionPanel event={selectedEvent} onSave={saveEvent} currentUserId={mode === "cloud" ? cloudUserId : undefined} />}
-        <DecisionOptionsPanel event={selectedEvent} onSave={saveEvent} currentUserId={mode === "cloud" ? cloudUserId : undefined} />
-        <MealHistoryPanel event={selectedEvent} onSave={saveEvent} currentUserId={mode === "cloud" ? cloudUserId : undefined} />
-      </div>
+    <section className="mx-auto max-w-3xl space-y-6">
+      {/* Top bar */}
+      <header className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-foreground sm:text-3xl" style={{ fontFamily: "Playfair Display, serif" }}>{event.title}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{meta}</p>
+          </div>
+          {isPreConfirmed && (
+            <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${mode === "cloud" ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"}`}>
+              {mode === "cloud" ? "邀请朋友一起填写" : "先自己试试"}
+            </span>
+          )}
+        </div>
+        {/* Stepper */}
+        <ol className="mt-4 flex items-center gap-1 text-xs">
+          {STEP_LABELS.map((label, index) => {
+            const reached = index <= stepIndex;
+            return (
+              <li key={`${label}-${index}`} className="flex flex-1 items-center gap-1">
+                <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${reached ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>{index < stepIndex ? "✓" : index + 1}</span>
+                <span className={reached ? "font-semibold text-foreground" : "text-muted-foreground"}>{label}</span>
+                {index < STEP_LABELS.length - 1 && <span className={`mx-1 h-px flex-1 ${index < stepIndex ? "bg-primary" : "bg-border"}`} />}
+              </li>
+            );
+          })}
+        </ol>
+        {developerMode && isRealtimeRefreshing && <p className="mt-3 text-sm text-muted-foreground" role="status" aria-label="正在同步云端饭局">正在同步云端饭局…</p>}
+      </header>
+
+      {realtimeError && <p className="rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">{realtimeError}</p>}
+      {saveError && <p className="rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">{saveError}</p>}
+
+      {/* Invite priority (creator, cloud) — only before confirmation */}
+      {isPreConfirmed && mode === "cloud" && cloudUserId && inviteRepository && inviteAppUrl && isCreator && (
+        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+          <p className="text-sm font-semibold text-foreground">已加入 {event.participants.length} 人（含你）</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">把邀请链接发给朋友，让他们填时间和偏好。</p>
+          <div className="mt-3">
+            <MealInvitePanel
+              eventId={event.id}
+              isCreator={isCreator}
+              repository={inviteRepository}
+              appUrl={inviteAppUrl}
+            />
+          </div>
+        </div>
+      )}
+
+      {(event.status === "collecting" || event.status === "deciding") && (
+        <MealCollectionPanel event={event} onSave={saveEvent} currentUserId={mode === "cloud" ? cloudUserId : undefined} />
+      )}
+      {isPreConfirmed && <MealConsensus event={event} />}
+      {(event.status === "collecting" || event.status === "deciding") && <DecisionOptionsPanel event={event} onSave={saveEvent} currentUserId={mode === "cloud" ? cloudUserId : undefined} />}
+      <MealHistoryPanel event={event} onSave={saveEvent} developerMode={developerMode} currentUserId={mode === "cloud" ? cloudUserId : undefined} />
+
+      {developerMode && <WorkspaceDebugPanel event={event} />}
     </section>
   );
 }
 
-function statusLabel(status: MealEvent["status"]): string {
-  return ({ collecting: "收集中", deciding: "决策中", confirmed: "已确认", completed: "已完成", draft: "草稿" })[status];
-}
-
 function sortEvents(events: MealEvent[]): MealEvent[] {
   return [...events].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+}
+
+function WorkspaceDebugPanel({ event }: { event: MealEvent }) {
+  const truncate = (value?: string) => (value && value.length > 8 ? `${value.slice(0, 8)}…` : value ?? "—");
+  const options = event.status === "deciding" ? rankMealOptions(event) : [];
+  return (
+    <section className="mt-6 rounded-2xl border border-dashed border-amber-300 bg-amber-50/40 p-4 text-xs" aria-label="饭局调试面板">
+      <p className="mb-2 font-semibold text-amber-700">饭局 Debug（开发者可见，仅既有数据）</p>
+      <dl className="grid gap-1.5 text-muted-foreground sm:grid-cols-2">
+        <div><dt className="inline font-medium text-foreground">Status: </dt><dd className="inline">{event.status}</dd></div>
+        <div><dt className="inline font-medium text-foreground">Event id: </dt><dd className="inline">{truncate(event.id)}</dd></div>
+      </dl>
+      {options.length > 0 && (
+        <div className="mt-3">
+          <p className="mb-1.5 font-medium text-foreground">Decision Engine 评分（仅决策中展示）</p>
+          <div className="space-y-2">
+            {options.map((option) => (
+              <div key={`${option.candidateId}-${option.date}-${option.mealPeriod}`} className="rounded-lg border border-amber-200 bg-white/60 px-3 py-2">
+                <p className="font-medium text-foreground">方案 · 总分 {option.totalScore}</p>
+                <p className="mt-0.5 text-muted-foreground">
+                  time {option.scoreBreakdown.time} · cuisine {option.scoreBreakdown.cuisine} · budget {option.scoreBreakdown.budget} · distance {option.scoreBreakdown.distance} · freshness {option.scoreBreakdown.freshness}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
 }
