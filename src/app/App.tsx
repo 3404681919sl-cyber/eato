@@ -8,6 +8,7 @@ import { DeveloperModeProvider } from "@/services/developerMode";
 // landing page needs; the rest is fetched on demand.
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
 const AppShell = lazy(() => import("@/app/AppShell"));
+const InterviewDemoPage = lazy(() => import("@/pages/InterviewDemoPage"));
 
 function PageLoader() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage onStart={() => navigate("/app")} />} />
             <Route path="/app" element={<AppShell />} />
+            <Route path="/demo" element={<InterviewDemoPage />} />
           </Routes>
         </Suspense>
       </DataProvider>
