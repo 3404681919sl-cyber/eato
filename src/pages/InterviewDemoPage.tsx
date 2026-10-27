@@ -234,7 +234,7 @@ export default function InterviewDemoPage() {
               <div className="flex flex-wrap items-end justify-between gap-2">
                 <div>
                   <h2 className="text-xl font-bold">03 · 共同决策与确认</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">基于当前时间、口味和预算进行规则计算。选择上面的不同成员后，可分别支持或否决候选。</p>
+                  <p className="mt-2 text-sm text-muted-foreground">基于当前时间、口味和预算进行规则计算（同一家餐厅在不同时段可形成多个方案）。选择上面的不同成员后，可分别支持或否决候选。</p>
                 </div>
                 <span className="text-xs text-muted-foreground">权重：时间 35% · 口味 25% · 预算 15% · 距离 15% · 历史 10%</span>
               </div>
@@ -257,16 +257,16 @@ export default function InterviewDemoPage() {
                       <p className="mt-2 text-xs leading-6 text-muted-foreground">{option.reasons.join("；")}</p>
                       {option.conflicts.length > 0 && <p className="mt-2 text-xs leading-5 text-amber-800">{option.conflicts.join("；")}</p>}
                       <div className="mt-4 flex gap-2">
-                        <button type="button" aria-label={"支持 " + candidate?.name} aria-pressed={voteValue === "support"} onClick={() => vote(option.candidateId, "support")}
+                        <button type="button" aria-label={"支持 " + candidate?.name + " " + option.date + " " + MEAL_PERIOD_LABELS[option.mealPeriod]} aria-pressed={voteValue === "support"} onClick={() => vote(option.candidateId, "support")}
                           className={voteValue === "support" ? "min-h-10 flex-1 rounded-lg bg-emerald-700 px-2 text-xs font-semibold text-white" : "min-h-10 flex-1 rounded-lg border border-border px-2 text-xs font-semibold hover:bg-secondary"}>
                           支持
                         </button>
-                        <button type="button" aria-label={"否决 " + candidate?.name} aria-pressed={voteValue === "veto"} onClick={() => vote(option.candidateId, "veto")}
+                        <button type="button" aria-label={"否决 " + candidate?.name + " " + option.date + " " + MEAL_PERIOD_LABELS[option.mealPeriod]} aria-pressed={voteValue === "veto"} onClick={() => vote(option.candidateId, "veto")}
                           className={voteValue === "veto" ? "min-h-10 flex-1 rounded-lg bg-red-700 px-2 text-xs font-semibold text-white" : "min-h-10 flex-1 rounded-lg border border-border px-2 text-xs font-semibold hover:bg-secondary"}>
                           否决
                         </button>
                       </div>
-                      <button type="button" aria-label={"确认 " + candidate?.name} disabled={!option.readyToConfirm || vetoed} onClick={() => confirm(option)}
+                      <button type="button" aria-label={"确认 " + candidate?.name + " " + option.date + " " + MEAL_PERIOD_LABELS[option.mealPeriod]} disabled={!option.readyToConfirm || vetoed} onClick={() => confirm(option)}
                         className="mt-2 min-h-11 w-full rounded-xl bg-primary px-3 text-sm font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-35">
                         {vetoed ? "有成员否决" : option.readyToConfirm ? "确认这家" : "共同时间未齐"}
                       </button>
